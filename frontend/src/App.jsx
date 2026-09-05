@@ -1,165 +1,135 @@
 import React, { useState, useEffect } from 'react';
+import heroEditorial from './assets/hero_editorial.jpg';
+import lunarImg from './assets/lunar_collection.jpg';
+import novaImg from './assets/nova_collection.jpg';
+import eclipseImg from './assets/eclipse_collection.jpg';
 
-// Collections Data
-const COLLECTIONS = [
-  {
-    id: 'lunar',
-    name: 'Lunar Collection',
-    tag: 'Collection 01',
-    description: 'Elegant silver rings inspired by moonlight and celestial crescents.',
-    image: 'https://images.unsplash.com/photo-1602751584552-8ba73aad10e1?auto=format&fit=crop&w=1000&q=80',
-    itemCount: '12 Creations',
-    category: 'Rings',
-  },
-  {
-    id: 'nova',
-    name: 'Nova Collection',
-    tag: 'Collection 02',
-    description: 'Modern earrings crafted with bold geometry and liquid chrome luster.',
-    image: 'https://images.unsplash.com/photo-1629224316810-9d8805b95e76?auto=format&fit=crop&w=1000&q=80',
-    itemCount: '8 Creations',
-    category: 'Earrings',
-  },
-  {
-    id: 'eclipse',
-    name: 'Eclipse Collection',
-    tag: 'Collection 03',
-    description: 'Timeless necklaces with dark luxury aesthetics and obsidian accents.',
-    image: 'https://images.unsplash.com/photo-1506630448388-4e683c67ddb0?auto=format&fit=crop&w=1000&q=80',
-    itemCount: '15 Creations',
-    category: 'Necklaces',
-  },
-];
+// Verified high-resolution luxury jewelry & fashion photography (served locally)
+const IMAGES = {
+  hero: heroEditorial,
+  lunar: lunarImg,
+  nova: novaImg,
+  eclipse: eclipseImg,
+  products: [
+    {
+      id: 1,
+      name: "The Solstice Signet Ring",
+      collection: "Lunar",
+      category: "Rings",
+      price: 340,
+      material: "925 Solid Silver • Hand Polished",
+      tag: "Best Seller",
+      image: lunarImg,
+      description: "Cast in solid 925 sterling silver with a sculpted celestial bevel. Individually hand-finished in our Milanese atelier."
+    },
+    {
+      id: 2,
+      name: "Nova Orbital Hoops",
+      collection: "Nova",
+      category: "Earrings",
+      price: 290,
+      material: "Liquid Rhodium • Micro-Pavé Moissanite",
+      tag: "New Arrival",
+      image: novaImg,
+      description: "Dual planetary concentric rings finished in high-lustre liquid rhodium for brilliant reflection under any ambient light."
+    },
+    {
+      id: 3,
+      name: "Eclipse Pavé Pendant",
+      collection: "Eclipse",
+      category: "Necklaces",
+      price: 480,
+      material: "Solid 925 Silver • 18\" Box Chain",
+      tag: "Iconic",
+      image: eclipseImg,
+      description: "Inspired by the geometry of a total lunar eclipse. Features a concealed clasp and architectural diamond-cut chain."
+    },
+    {
+      id: 4,
+      name: "Stardust Band Ring",
+      collection: "Lunar",
+      category: "Rings",
+      price: 310,
+      material: "Mirror Chrome Finish • Platinum Dipped",
+      tag: "Limited",
+      image: lunarImg,
+      description: "A continuous band sculpted with tactile cosmic fluting. Dipped in rare platinum for unmatched resistance to tarnish."
+    },
+    {
+      id: 5,
+      name: "Celestial Cascade Choker",
+      collection: "Nova",
+      category: "Necklaces",
+      price: 620,
+      material: "Pure Argentium Silver • Hallmarked",
+      tag: "Haute Joaillerie",
+      image: eclipseImg,
+      description: "An editorial statement collar that rests effortlessly along the collarbone. Hand-articulated links provide fluid movement."
+    },
+    {
+      id: 6,
+      name: "Astral Drop Earrings",
+      collection: "Eclipse",
+      category: "Earrings",
+      price: 360,
+      material: "Solid Silver • Bespoke Hinged Backs",
+      tag: "New",
+      image: novaImg,
+      description: "Elongated architectural teardrops featuring a brushed matte interior contrasted against mirror-chrome outer bevels."
+    }
+  ],
+  categories: [
+    { name: "Rings", count: "18 Creations", image: lunarImg },
+    { name: "Earrings", count: "14 Creations", image: novaImg },
+    { name: "Necklaces", count: "12 Creations", image: eclipseImg },
+    { name: "Haute Joaillerie", count: "8 Masterpieces", image: heroEditorial }
+  ],
+  craftsmanship: heroEditorial
+};
 
-// Shop Categories
-const CATEGORIES = [
-  {
-    id: 'rings',
-    name: 'Rings',
-    subtitle: 'Sculptural Bands & Astral Solitaires',
-    image: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=900&q=80',
-    count: '24 Designs',
-  },
-  {
-    id: 'earrings',
-    name: 'Earrings',
-    subtitle: 'Geometric Hoops & Celestial Drops',
-    image: 'https://images.unsplash.com/photo-1630019852942-f89202989a59?auto=format&fit=crop&w=900&q=80',
-    count: '18 Designs',
-  },
-  {
-    id: 'necklaces',
-    name: 'Necklaces',
-    subtitle: 'Statement Collars & Orbit Pendants',
-    image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=900&q=80',
-    count: '21 Designs',
-  },
-];
-
-// Featured Products
-const PRODUCTS = [
-  {
-    id: 1,
-    name: 'Lunar Silver Ring',
-    price: 799,
-    category: 'Rings',
-    badge: 'Pure 925 Silver',
-    description: 'A liquid-silver band sculpted to mirror the soft luminescence of the crescent moon. Finished with high-refraction rhodium plating for eternal brilliance.',
-    image: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=800&q=80',
-    material: '925 Sterling Silver',
-    finish: 'Mirror Chrome Polish',
-  },
-  {
-    id: 2,
-    name: 'Nova Hoop Earrings',
-    price: 599,
-    category: 'Earrings',
-    badge: 'Bestseller',
-    description: 'Sculptural, hollow-form geometric hoops engineered for featherlight weight and striking architectural presence.',
-    image: 'https://images.unsplash.com/photo-1630019852942-f89202989a59?auto=format&fit=crop&w=800&q=80',
-    material: 'Hypoallergenic Silver Alloy',
-    finish: 'Satin Chrome',
-  },
-  {
-    id: 3,
-    name: 'Eclipse Necklace',
-    price: 999,
-    category: 'Necklaces',
-    badge: 'Signature Piece',
-    description: 'An obsidian-toned obsidian inlay cradled within a solid silver orbit, evoking the quiet drama of a solar eclipse.',
-    image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=800&q=80',
-    material: '925 Silver & Black Spinel',
-    finish: 'Smoked Chrome & High Polish',
-  },
-  {
-    id: 4,
-    name: 'Stardust Ring',
-    price: 699,
-    category: 'Rings',
-    badge: 'Limited Edition',
-    description: 'Micro-pavé celestial crystals embedded along a razor-thin contoured band, catching every flicker of ambient light.',
-    image: 'https://images.unsplash.com/photo-1603561591411-07134e71a2a9?auto=format&fit=crop&w=800&q=80',
-    material: '925 Sterling Silver & Lab Crystals',
-    finish: 'Liquid Silver Rhodium',
-  },
-  {
-    id: 5,
-    name: 'Celestial Earrings',
-    price: 549,
-    category: 'Earrings',
-    badge: 'New Arrival',
-    description: 'Cascading linear drops terminating in faceted starburst pendants that sway with graceful fluidity with every gesture.',
-    image: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=800&q=80',
-    material: '925 Sterling Silver',
-    finish: 'Diamond Cut Reflective',
-  },
-  {
-    id: 6,
-    name: 'Orbit Necklace',
-    price: 1099,
-    category: 'Necklaces',
-    badge: 'Haute Joaillerie',
-    description: 'Interlocking concentric ellipses suspended on a delicate Venetian box chain, embodying cosmic equilibrium and eternal symmetry.',
-    image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=800&q=80',
-    material: '925 Sterling Silver',
-    finish: 'Dual Chrome & Matte Rim',
-  },
-];
-
-const App = () => {
-  // Loading Screen State
+export default function App() {
+  // State management
   const [loading, setLoading] = useState(true);
-  const [loadingFade, setLoadingFade] = useState(false);
-
-  // App State
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [cart, setCart] = useState([]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [loaderVisible, setLoaderVisible] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
+  const [cart, setCart] = useState([
+    {
+      id: 1,
+      name: "The Solstice Signet Ring",
+      price: 340,
+      quantity: 1,
+      material: "925 Solid Silver",
+      image: lunarImg
+    }
+  ]);
+  const [activeCategory, setActiveCategory] = useState("All");
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('All');
-  const [toastMessage, setToastMessage] = useState('');
+  const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [newsletterSubscribed, setNewsletterSubscribed] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
 
-  // 1. Luxury Loading Screen: 2.2s duration with smooth scale and fade-out
+  // Luxury Loading Screen (1.8s smooth intro)
   useEffect(() => {
     const fadeTimer = setTimeout(() => {
-      setLoadingFade(true);
-    }, 2000);
-
-    const endTimer = setTimeout(() => {
       setLoading(false);
-    }, 2600);
+    }, 1800);
+
+    const removeTimer = setTimeout(() => {
+      setLoaderVisible(false);
+    }, 2400);
 
     return () => {
       clearTimeout(fadeTimer);
-      clearTimeout(endTimer);
+      clearTimeout(removeTimer);
     };
   }, []);
 
-  const triggerToast = (msg) => {
+  const showToast = (msg) => {
     setToastMessage(msg);
     setTimeout(() => {
-      setToastMessage('');
-    }, 3000);
+      setToastMessage("");
+    }, 3200);
   };
 
   const addToCart = (product) => {
@@ -170,16 +140,23 @@ const App = () => {
           item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
         );
       }
-      return [...prev, { ...product, quantity: 1 }];
+      return [
+        ...prev,
+        {
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          quantity: 1,
+          material: product.material,
+          image: product.image
+        }
+      ];
     });
-    triggerToast(`Added ${product.name} to your bag.`);
+    showToast(`Added "${product.name}" to your bag`);
+    setCartOpen(true);
   };
 
-  const removeFromCart = (id) => {
-    setCart((prev) => prev.filter((item) => item.id !== id));
-  };
-
-  const updateQuantity = (id, delta) => {
+  const updateCartQty = (id, delta) => {
     setCart((prev) =>
       prev
         .map((item) => {
@@ -193,817 +170,890 @@ const App = () => {
     );
   };
 
-  const totalCartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-  const cartSubtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const cartTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
-  const filteredProducts =
-    selectedCategoryFilter === 'All'
-      ? PRODUCTS
-      : PRODUCTS.filter((p) => p.category === selectedCategoryFilter);
+  const filteredProducts = activeCategory === "All"
+    ? IMAGES.products
+    : IMAGES.products.filter((p) => p.category === activeCategory);
 
   return (
-    <div className="min-h-screen bg-black text-white selection:bg-[#C0C0C0] selection:text-black font-sans relative overflow-x-hidden">
+    <div className="min-h-screen bg-black text-white font-sans selection:bg-[#C0C0C0] selection:text-black antialiased relative">
+      
       {/* 1. LUXURY LOADING SCREEN */}
-      {loading && (
+      {loaderVisible && (
         <div
-          className={`fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center transition-opacity duration-700 ease-out ${
-            loadingFade ? 'opacity-0 pointer-events-none' : 'opacity-100'
+          className={`fixed inset-0 z-50 bg-black flex flex-col items-center justify-center transition-opacity duration-700 pointer-events-none ${
+            loading ? "opacity-100" : "opacity-0"
           }`}
         >
-          {/* Subtle Ambient Halo */}
-          <div className="absolute w-72 h-72 rounded-full bg-[#C0C0C0]/10 blur-3xl"></div>
-
-          <div className="relative z-10 flex flex-col items-center text-center px-4">
-            <div className="w-10 h-10 mb-6 rounded-full border border-[#C0C0C0]/30 flex items-center justify-center animate-pulse">
-              <span className="w-2.5 h-2.5 rounded-full bg-gradient-to-tr from-[#999999] via-[#C0C0C0] to-white shadow-[0_0_12px_#C0C0C0]"></span>
-            </div>
-
-            <h1 className="text-4xl sm:text-6xl md:text-7xl font-serif uppercase tracking-[0.35em] text-transparent bg-clip-text bg-gradient-to-r from-[#999999] via-white to-[#CCCCCC] animate-luxury-scale">
+          <div className="text-center px-6 flex flex-col items-center">
+            <span className="text-[10px] uppercase tracking-[0.45em] text-[#A0A0A0] mb-4">
+              Haute Joaillerie
+            </span>
+            <h1
+              className="text-4xl md:text-7xl font-serif font-light tracking-[0.35em] uppercase chrome-gradient-text animate-luxury-scale drop-shadow-[0_0_35px_rgba(192,192,192,0.35)]"
+            >
               COSMIC
             </h1>
-
-            <p className="mt-4 text-[10px] sm:text-xs uppercase tracking-[0.4em] text-[#C0C0C0]/70 font-light">
-              Haute Joaillerie & Celestial Silver
+            <div className="w-24 h-[1px] bg-gradient-to-r from-transparent via-[#C0C0C0] to-transparent mt-6 mb-4 animate-pulse-subtle" />
+            <p className="text-xs uppercase tracking-[0.3em] text-[#808080] font-light">
+              Milan • Paris • New York
             </p>
-
-            <div className="mt-8 w-36 h-[1px] bg-neutral-800 relative overflow-hidden">
-              <div className="absolute inset-y-0 left-0 w-full bg-gradient-to-r from-transparent via-[#C0C0C0] to-transparent animate-shimmer"></div>
-            </div>
           </div>
         </div>
       )}
 
-      {/* Floating Toast Notification */}
+      {/* TOAST NOTIFICATION */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-neutral-900/95 border border-[#C0C0C0]/40 backdrop-blur-xl px-5 py-3.5 rounded-full shadow-[0_10px_30px_rgba(0,0,0,0.8)] transition-all animate-fadeIn">
-          <span className="w-2 h-2 rounded-full bg-[#C0C0C0] animate-pulse"></span>
-          <span className="text-xs tracking-wider uppercase text-neutral-200">{toastMessage}</span>
+        <div className="fixed bottom-6 right-6 z-50 bg-[#111111]/95 border border-[#C0C0C0]/40 backdrop-blur-md px-5 py-3 rounded-none shadow-[0_10px_30px_rgba(0,0,0,0.8)] flex items-center gap-3 animate-fade-in text-xs uppercase tracking-widest text-white">
+          <span className="w-2 h-2 rounded-full bg-[#C0C0C0] animate-pulse" />
+          {toastMessage}
         </div>
       )}
 
-      {/* Top Luxury Announcement Bar */}
-      <div className="bg-[#050505] border-b border-[#C0C0C0]/15 text-center py-2.5 px-4 text-[10px] sm:text-[11px] uppercase tracking-[0.25em] text-[#C0C0C0]/80 flex items-center justify-center gap-3">
-        <span className="hidden sm:inline">Complimentary Insured Delivery Worldwide</span>
-        <span className="hidden sm:inline text-neutral-600">•</span>
-        <span>Signature Obsidian Presentation Box Included</span>
+      {/* 2. TOP ANNOUNCEMENT BAR */}
+      <div className="bg-[#0A0A0A] border-b border-[#222222] py-2 px-4 text-[11px] uppercase tracking-[0.25em] text-center text-[#A0A0A0] flex items-center justify-center gap-4">
+        <span>Complimentary Express Courier on Orders Above $500</span>
+        <span className="hidden md:inline text-[#444444]">•</span>
+        <span className="hidden md:inline">Certified 925 Solid Silver & Platinum Dipping</span>
       </div>
 
-      {/* 2. NAVBAR */}
-      <nav className="bg-black/85 backdrop-blur-md sticky top-0 z-50 border-b border-[#C0C0C0]/20 transition-all">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 sm:h-20 items-center justify-between">
-            {/* Brand Logo */}
-            <a href="#" className="group flex items-center gap-2.5">
-              <span className="w-5 h-5 rounded-full border border-[#C0C0C0]/50 flex items-center justify-center transition-transform duration-500 group-hover:rotate-180">
-                <span className="w-1.5 h-1.5 rounded-full bg-gradient-to-tr from-[#999999] via-[#C0C0C0] to-white shadow-[0_0_8px_#C0C0C0]"></span>
-              </span>
-              <span className="text-xl sm:text-2xl font-serif tracking-[0.3em] uppercase bg-gradient-to-r from-white via-[#E8E8E8] to-[#999999] bg-clip-text text-transparent group-hover:to-white transition-all">
-                COSMIC
-              </span>
+      {/* 3. STICKY LUXURY NAVBAR */}
+      <header className="sticky top-0 z-40 bg-black/85 backdrop-blur-xl border-b border-white/10 transition-colors duration-300">
+        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+          
+          {/* Mobile Menu Toggle */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden text-white hover:text-[#C0C0C0] transition-colors p-2 -ml-2"
+            aria-label="Toggle Menu"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              {mobileMenuOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 7h16M4 12h16M4 17h16" />
+              )}
+            </svg>
+          </button>
+
+          {/* Left Navigation (Desktop) */}
+          <nav className="hidden md:flex items-center space-x-10 text-xs uppercase tracking-[0.25em] font-medium text-[#C0C0C0]">
+            <a href="#collections" className="hover:text-white transition-colors relative py-1 group">
+              Collections
+              <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-[#C0C0C0] transition-all duration-300 group-hover:w-full" />
             </a>
+            <a href="#shop" className="hover:text-white transition-colors relative py-1 group">
+              Fine Jewelry
+              <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-[#C0C0C0] transition-all duration-300 group-hover:w-full" />
+            </a>
+            <a href="#maison" className="hover:text-white transition-colors relative py-1 group">
+              The Maison
+              <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-[#C0C0C0] transition-all duration-300 group-hover:w-full" />
+            </a>
+          </nav>
 
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-10 text-xs tracking-[0.2em] uppercase font-medium">
-              <a href="#hero" className="text-neutral-300 hover:text-[#C0C0C0] transition-colors duration-200 py-1 relative group">
-                Home
-                <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-[#C0C0C0] transition-all duration-300 group-hover:w-full"></span>
-              </a>
-              <a href="#collections" className="text-neutral-300 hover:text-[#C0C0C0] transition-colors duration-200 py-1 relative group">
-                Collections
-                <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-[#C0C0C0] transition-all duration-300 group-hover:w-full"></span>
-              </a>
-              <a href="#categories" className="text-neutral-300 hover:text-[#C0C0C0] transition-colors duration-200 py-1 relative group">
-                Categories
-                <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-[#C0C0C0] transition-all duration-300 group-hover:w-full"></span>
-              </a>
-              <a href="#products" className="text-neutral-300 hover:text-[#C0C0C0] transition-colors duration-200 py-1 relative group">
-                Shop
-                <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-[#C0C0C0] transition-all duration-300 group-hover:w-full"></span>
-              </a>
-              <a href="#story" className="text-neutral-300 hover:text-[#C0C0C0] transition-colors duration-200 py-1 relative group">
-                About
-                <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-[#C0C0C0] transition-all duration-300 group-hover:w-full"></span>
-              </a>
-            </div>
+          {/* Center Brand Logo */}
+          <a
+            href="#"
+            className="flex flex-col items-center group cursor-pointer text-center"
+          >
+            <span className="font-serif text-2xl md:text-3xl tracking-[0.32em] font-normal uppercase chrome-gradient-text group-hover:opacity-90 transition-opacity">
+              COSMIC
+            </span>
+            <span className="text-[8px] uppercase tracking-[0.4em] text-[#707070] -mt-1 group-hover:text-[#A0A0A0] transition-colors">
+              Haute Joaillerie
+            </span>
+          </a>
 
-            {/* Cart & Controls */}
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={() => setIsCartOpen(true)}
-                className="relative p-2.5 text-neutral-300 hover:text-white transition-colors duration-200 group flex items-center gap-2"
-                aria-label="View Shopping Bag"
-              >
-                <span className="hidden sm:inline text-xs uppercase tracking-[0.15em] text-[#C0C0C0] group-hover:text-white">
-                  Cart
-                </span>
-                <svg className="w-5 h-5 transition-transform duration-200 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          {/* Right Navigation / Bag */}
+          <div className="flex items-center space-x-6 text-xs uppercase tracking-[0.2em]">
+            <a
+              href="#shop"
+              className="hidden lg:inline text-[#A0A0A0] hover:text-white transition-colors"
+            >
+              Search
+            </a>
+            <button
+              onClick={() => setCartOpen(true)}
+              className="relative p-2 text-white hover:text-[#C0C0C0] transition-colors flex items-center gap-2 group cursor-pointer"
+              aria-label="Shopping Bag"
+            >
+              <span className="text-xs uppercase tracking-widest hidden sm:inline text-[#A0A0A0] group-hover:text-white">
+                Bag
+              </span>
+              <div className="relative">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                 </svg>
-                {/* Cart Badge */}
-                <span className="flex h-4 w-4 items-center justify-center bg-[#C0C0C0] text-black text-[10px] font-bold rounded-full shadow-[0_0_8px_rgba(192,192,192,0.8)]">
-                  {totalCartCount}
-                </span>
-              </button>
-
-              {/* Mobile Menu Button with comfortable touch target */}
-              <div className="md:hidden">
-                <button
-                  onClick={() => setIsMenuOpen(!isMenuOpen)}
-                  className="p-2.5 text-[#C0C0C0] hover:text-white transition-colors duration-200 focus:outline-none"
-                  aria-label="Open menu"
-                >
-                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    {isMenuOpen ? (
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    ) : (
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                    )}
-                  </svg>
-                </button>
+                {cartCount > 0 && (
+                  <span className="absolute -top-1.5 -right-2 bg-white text-black text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                    {cartCount}
+                  </span>
+                )}
               </div>
-            </div>
+            </button>
           </div>
         </div>
 
-        {/* Mobile Slide-down Menu */}
-        {isMenuOpen && (
-          <div className="md:hidden bg-black/95 backdrop-blur-2xl border-b border-[#C0C0C0]/20 px-6 py-6 space-y-4">
-            <nav className="flex flex-col space-y-2 text-sm uppercase tracking-[0.25em]">
-              <a
-                href="#hero"
-                onClick={() => setIsMenuOpen(false)}
-                className="text-neutral-300 hover:text-[#C0C0C0] transition-colors py-3 border-b border-neutral-900"
-              >
-                Home
-              </a>
+        {/* Mobile Navigation Drawer */}
+        {mobileMenuOpen && (
+          <div className="md:hidden bg-[#0a0a0a] border-b border-white/10 px-6 py-8 space-y-6">
+            <nav className="flex flex-col space-y-4 text-sm uppercase tracking-[0.25em]">
               <a
                 href="#collections"
-                onClick={() => setIsMenuOpen(false)}
-                className="text-neutral-300 hover:text-[#C0C0C0] transition-colors py-3 border-b border-neutral-900"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-[#C0C0C0] hover:text-white py-2 border-b border-white/5"
               >
                 Collections
+              </a>
+              <a
+                href="#shop"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-[#C0C0C0] hover:text-white py-2 border-b border-white/5"
+              >
+                Fine Jewelry
               </a>
               <a
                 href="#categories"
-                onClick={() => setIsMenuOpen(false)}
-                className="text-neutral-300 hover:text-[#C0C0C0] transition-colors py-3 border-b border-neutral-900"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-[#C0C0C0] hover:text-white py-2 border-b border-white/5"
               >
                 Categories
               </a>
               <a
-                href="#products"
-                onClick={() => setIsMenuOpen(false)}
-                className="text-neutral-300 hover:text-[#C0C0C0] transition-colors py-3 border-b border-neutral-900"
+                href="#maison"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-[#C0C0C0] hover:text-white py-2 border-b border-white/5"
               >
-                Shop All
-              </a>
-              <a
-                href="#story"
-                onClick={() => setIsMenuOpen(false)}
-                className="text-neutral-300 hover:text-[#C0C0C0] transition-colors py-3 border-b border-neutral-900"
-              >
-                About Cosmic
+                The Maison & Craft
               </a>
             </nav>
-            <button
-              onClick={() => {
-                setIsMenuOpen(false);
-                setIsCartOpen(true);
-              }}
-              className="w-full py-3.5 bg-[#C0C0C0] text-black text-xs uppercase tracking-[0.2em] font-semibold hover:bg-white transition-all flex items-center justify-center gap-2"
-            >
-              <span>View Shopping Bag</span>
-              <span>({totalCartCount})</span>
-            </button>
+            <div className="pt-4 text-xs tracking-widest text-[#707070] uppercase">
+              Boutiques: Milan • Paris • New York • Tokyo
+            </div>
           </div>
         )}
-      </nav>
+      </header>
 
-      {/* 3. HERO SECTION */}
-      <section
-        id="hero"
-        className="relative min-h-[90vh] lg:min-h-screen flex items-center justify-center overflow-hidden py-16 sm:py-24"
-      >
-        {/* Large Luxury Lifestyle Editorial Background */}
+      {/* 4. HERO SECTION */}
+      <section className="relative min-h-[80vh] max-h-[850px] flex items-center justify-center overflow-hidden border-b border-white/10">
+        {/* Background Editorial Image with Luxury Dark Overlays */}
         <div className="absolute inset-0 z-0">
           <img
-            src="https://images.unsplash.com/photo-1576053139778-7e32f2ae3cfd?auto=format&fit=crop&w=2000&q=85"
-            alt="Cosmic Luxury Jewelry Editorial"
-            className="w-full h-full object-cover object-center filter brightness-45 scale-105"
+            src={IMAGES.hero}
+            alt="COSMIC Haute Joaillerie editorial campaign"
+            className="w-full h-full object-cover object-center filter brightness-90 contrast-105 opacity-60 transition-transform duration-1000 ease-out hover:scale-102"
           />
-          {/* Multi-layered Dark Vignette Overlays */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/30"></div>
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_20%,#000000_80%)]"></div>
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-transparent to-black/80"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,rgba(0,0,0,0.85)_100%)]" />
         </div>
 
-        {/* Concentric Orbital Ring Visual */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[580px] h-[580px] sm:w-[800px] sm:h-[800px] border border-[#C0C0C0]/10 rounded-full pointer-events-none animate-[spin_120s_linear_infinite]"></div>
-
-        {/* Hero Content with Editorial Hierarchy */}
-        <div className="relative z-10 flex flex-col items-center text-center px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
-          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-[#C0C0C0]/30 bg-black/60 backdrop-blur-md mb-6 sm:mb-8">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#C0C0C0] shadow-[0_0_6px_#C0C0C0]"></span>
-            <span className="text-[10px] sm:text-xs uppercase tracking-[0.3em] text-[#C0C0C0]">
-              Maison de Haute Joaillerie
+        {/* Hero Content */}
+        <div className="relative z-10 max-w-5xl mx-auto px-6 text-center py-16 md:py-20">
+          <div className="inline-flex items-center gap-3 px-4 py-1.5 border border-white/20 bg-black/40 backdrop-blur-md mb-8">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#C0C0C0] animate-pulse" />
+            <span className="text-[11px] uppercase tracking-[0.35em] text-[#D0D0D0] font-light">
+              High Jewelry Edition • Autumn / Winter
             </span>
           </div>
 
-          <h1 className="font-serif text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-light tracking-tight leading-[1.05] sm:leading-[0.95] mb-6 text-transparent bg-clip-text bg-gradient-to-b from-white via-[#E8E8E8] to-[#999999]">
+          <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-serif font-light uppercase tracking-[0.18em] leading-tight mb-6 chrome-gradient-text drop-shadow-[0_15px_30px_rgba(0,0,0,0.9)]">
             Wear The Universe
           </h1>
 
-          <p className="mb-10 text-base sm:text-lg md:text-xl max-w-xl text-neutral-300 font-light tracking-wide leading-relaxed">
-            Premium accessories inspired by elegance and crafted for every style.
+          <p className="max-w-2xl mx-auto text-base sm:text-lg md:text-xl text-[#C0C0C0] font-light tracking-wide leading-relaxed mb-12">
+            Premium accessories inspired by celestial elegance and sculpted in solid 925 sterling silver and rare platinum for the modern icon.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-5">
             <a
               href="#collections"
-              className="w-full sm:w-auto px-8 sm:px-10 py-4 bg-[#C0C0C0] text-black text-xs uppercase tracking-[0.25em] font-semibold rounded-none hover:bg-white hover:shadow-[0_0_30px_rgba(192,192,192,0.4)] transition-all duration-300 text-center"
+              className="w-full sm:w-auto px-10 py-4 chrome-button text-xs uppercase tracking-[0.3em] font-semibold text-center"
             >
               Explore Collection
             </a>
             <a
-              href="#products"
-              className="w-full sm:w-auto px-8 sm:px-10 py-4 border border-[#C0C0C0]/50 text-white text-xs uppercase tracking-[0.25em] font-medium hover:border-[#C0C0C0] hover:bg-white/10 backdrop-blur-sm transition-all duration-300 text-center"
+              href="#shop"
+              className="w-full sm:w-auto px-10 py-4 border border-[#C0C0C0]/50 hover:border-white hover:bg-white/5 transition-all text-xs uppercase tracking-[0.3em] text-[#E0E0E0] font-medium backdrop-blur-md text-center"
             >
-              View New Arrivals
+              New Arrivals
             </a>
           </div>
 
-          <div className="mt-12 sm:mt-16 flex flex-col items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
-            <span className="text-[9px] uppercase tracking-[0.3em] text-[#C0C0C0]">Scroll To Discover</span>
-            <div className="w-[1px] h-8 bg-gradient-to-b from-[#C0C0C0] to-transparent"></div>
-          </div>
-        </div>
-      </section>
-
-      {/* 4. FEATURED COLLECTIONS (CLEAN ASPECT RATIO, NEVER COLLAPSED) */}
-      <section id="collections" className="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 relative z-10 border-t border-[#C0C0C0]/15">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 sm:mb-16 pb-6 border-b border-[#C0C0C0]/15 gap-6">
+          {/* Pillars Bar */}
+          <div className="mt-20 pt-8 border-t border-white/10 grid grid-cols-2 md:grid-cols-4 gap-6 text-left">
             <div>
-              <span className="text-xs uppercase tracking-[0.3em] text-[#C0C0C0] block mb-2">Curated Capsules</span>
-              <h2 className="font-serif text-3xl sm:text-5xl font-light text-white tracking-tight">
-                Featured Collections
-              </h2>
+              <span className="text-[10px] uppercase tracking-[0.25em] text-[#888888] block">Material</span>
+              <span className="text-xs uppercase tracking-wider text-white font-medium">925 Sterling & Rhodium</span>
             </div>
-            <p className="max-w-md text-sm text-neutral-400 font-light leading-relaxed">
-              Three singular celestial aesthetics sculpted in ethically sourced pure sterling silver with hand-finished liquid chrome precision.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {COLLECTIONS.map((col) => (
-              <div
-                key={col.id}
-                className="group relative flex flex-col border border-[#C0C0C0]/20 bg-neutral-950/60 backdrop-blur-xl transition-all duration-500 hover:border-[#C0C0C0]/70 hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(0,0,0,0.8),0_0_20px_rgba(192,192,192,0.1)]"
-              >
-                {/* Independent Image Container with Fixed Aspect Ratio */}
-                <div className="relative w-full aspect-[4/5] overflow-hidden bg-neutral-900">
-                  <img
-                    src={col.image}
-                    alt={col.name}
-                    className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 filter brightness-90 group-hover:brightness-100"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
-                  <div className="absolute top-4 left-4 px-3 py-1 bg-black/80 backdrop-blur-md border border-[#C0C0C0]/30 text-[10px] uppercase tracking-[0.2em] text-[#C0C0C0]">
-                    {col.tag}
-                  </div>
-                </div>
-
-                {/* Card Content Below Image */}
-                <div className="p-6 sm:p-7 flex flex-col flex-grow justify-between">
-                  <div>
-                    <div className="text-xs uppercase tracking-[0.2em] text-[#C0C0C0]/70 mb-1.5">
-                      {col.itemCount}
-                    </div>
-                    <h3 className="font-serif text-2xl font-light text-white mb-2 group-hover:text-[#E8E8E8] transition-colors">
-                      {col.name}
-                    </h3>
-                    <p className="text-xs sm:text-sm text-neutral-400 font-light leading-relaxed mb-6">
-                      {col.description}
-                    </p>
-                  </div>
-
-                  <button
-                    onClick={() => {
-                      setSelectedCategoryFilter(col.category);
-                      const el = document.getElementById('products');
-                      if (el) el.scrollIntoView({ behavior: 'smooth' });
-                    }}
-                    className="w-full py-3.5 border border-[#C0C0C0]/30 bg-transparent text-[11px] uppercase tracking-[0.2em] font-medium text-white transition-all duration-300 group-hover:border-[#C0C0C0] group-hover:bg-white/10 flex items-center justify-center gap-2"
-                  >
-                    <span>Explore {col.name}</span>
-                    <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            ))}
+            <div>
+              <span className="text-[10px] uppercase tracking-[0.25em] text-[#888888] block">Origin</span>
+              <span className="text-xs uppercase tracking-wider text-white font-medium">Milanese Handcraft</span>
+            </div>
+            <div>
+              <span className="text-[10px] uppercase tracking-[0.25em] text-[#888888] block">Editions</span>
+              <span className="text-xs uppercase tracking-wider text-white font-medium">Limited Artisanal Runs</span>
+            </div>
+            <div>
+              <span className="text-[10px] uppercase tracking-[0.25em] text-[#888888] block">Guarantee</span>
+              <span className="text-xs uppercase tracking-wider text-white font-medium">Lifetime Authenticity</span>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* 5. SHOP BY CATEGORY */}
-      <section id="categories" className="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 relative z-10 bg-[#040404] border-t border-[#C0C0C0]/15">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
-            <span className="text-xs uppercase tracking-[0.3em] text-[#C0C0C0] block mb-2">Universe by Design</span>
-            <h2 className="font-serif text-3xl sm:text-5xl font-light text-white tracking-tight mb-4">
-              Shop By Category
+      {/* 5. FEATURED COLLECTIONS */}
+      <section id="collections" className="py-24 px-6 max-w-7xl mx-auto border-b border-white/10">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16">
+          <div>
+            <span className="text-[11px] uppercase tracking-[0.4em] text-[#999999] block mb-3">
+              Curated Worlds
+            </span>
+            <h2 className="text-3xl md:text-5xl font-serif uppercase tracking-[0.2em] text-white">
+              The Celestial Series
             </h2>
-            <p className="text-sm text-neutral-400 font-light leading-relaxed">
-              Timeless silhouettes designed to be stacked, layered, and worn with effortless confidence.
-            </p>
+          </div>
+          <p className="text-xs uppercase tracking-[0.25em] text-[#A0A0A0] mt-4 md:mt-0 max-w-xs leading-relaxed">
+            Three distinct design expressions inspired by the physics and geometry of the night sky.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Collection 1: Lunar */}
+          <div className="group relative border border-white/10 bg-[#080808] transition-all duration-500 hover:border-[#C0C0C0]/60 flex flex-col">
+            <div className="relative aspect-[4/5] overflow-hidden bg-neutral-900">
+              <img
+                src={IMAGES.lunar}
+                alt="Lunar Collection"
+                className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80" />
+              <div className="absolute top-4 left-4 text-[10px] uppercase tracking-[0.25em] bg-black/70 backdrop-blur-md px-3 py-1 border border-white/10 text-[#C0C0C0]">
+                Collection I
+              </div>
+            </div>
+            <div className="p-6 flex-1 flex flex-col justify-between">
+              <div>
+                <h3 className="font-serif text-2xl tracking-[0.18em] uppercase text-white mb-2 group-hover:text-[#C0C0C0] transition-colors">
+                  Lunar
+                </h3>
+                <p className="text-xs text-[#999999] leading-relaxed font-light mb-6">
+                  Architectural silhouettes cast in solid sterling silver with clean mirror-finished planar surfaces.
+                </p>
+              </div>
+              <a
+                href="#shop"
+                onClick={() => setActiveCategory("Rings")}
+                className="text-xs uppercase tracking-[0.25em] text-white flex items-center gap-2 group-hover:gap-4 transition-all"
+              >
+                <span>Explore Lunar</span>
+                <span>→</span>
+              </a>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {CATEGORIES.map((cat) => (
-              <div
-                key={cat.id}
-                onClick={() => {
-                  setSelectedCategoryFilter(cat.name);
-                  const el = document.getElementById('products');
-                  if (el) el.scrollIntoView({ behavior: 'smooth' });
-                }}
-                className="group relative h-[420px] sm:h-[480px] overflow-hidden border border-[#C0C0C0]/20 cursor-pointer transition-all duration-500 hover:border-[#C0C0C0]/70 hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(0,0,0,0.8)]"
+          {/* Collection 2: Nova */}
+          <div className="group relative border border-white/10 bg-[#080808] transition-all duration-500 hover:border-[#C0C0C0]/60 flex flex-col">
+            <div className="relative aspect-[4/5] overflow-hidden bg-neutral-900">
+              <img
+                src={IMAGES.nova}
+                alt="Nova Collection"
+                className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80" />
+              <div className="absolute top-4 left-4 text-[10px] uppercase tracking-[0.25em] bg-black/70 backdrop-blur-md px-3 py-1 border border-white/10 text-[#C0C0C0]">
+                Collection II
+              </div>
+            </div>
+            <div className="p-6 flex-1 flex flex-col justify-between">
+              <div>
+                <h3 className="font-serif text-2xl tracking-[0.18em] uppercase text-white mb-2 group-hover:text-[#C0C0C0] transition-colors">
+                  Nova
+                </h3>
+                <p className="text-xs text-[#999999] leading-relaxed font-light mb-6">
+                  Dynamic stellar radiance captured through liquid rhodium dipped metals and ethically cultured moissanite.
+                </p>
+              </div>
+              <a
+                href="#shop"
+                onClick={() => setActiveCategory("Earrings")}
+                className="text-xs uppercase tracking-[0.25em] text-white flex items-center gap-2 group-hover:gap-4 transition-all"
               >
+                <span>Explore Nova</span>
+                <span>→</span>
+              </a>
+            </div>
+          </div>
+
+          {/* Collection 3: Eclipse */}
+          <div className="group relative border border-white/10 bg-[#080808] transition-all duration-500 hover:border-[#C0C0C0]/60 flex flex-col">
+            <div className="relative aspect-[4/5] overflow-hidden bg-neutral-900">
+              <img
+                src={IMAGES.eclipse}
+                alt="Eclipse Collection"
+                className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80" />
+              <div className="absolute top-4 left-4 text-[10px] uppercase tracking-[0.25em] bg-black/70 backdrop-blur-md px-3 py-1 border border-white/10 text-[#C0C0C0]">
+                Collection III
+              </div>
+            </div>
+            <div className="p-6 flex-1 flex flex-col justify-between">
+              <div>
+                <h3 className="font-serif text-2xl tracking-[0.18em] uppercase text-white mb-2 group-hover:text-[#C0C0C0] transition-colors">
+                  Eclipse
+                </h3>
+                <p className="text-xs text-[#999999] leading-relaxed font-light mb-6">
+                  Sculptural mystery blending oxidised deep shadow accents with hand-polished chrome high-points.
+                </p>
+              </div>
+              <a
+                href="#shop"
+                onClick={() => setActiveCategory("Necklaces")}
+                className="text-xs uppercase tracking-[0.25em] text-white flex items-center gap-2 group-hover:gap-4 transition-all"
+              >
+                <span>Explore Eclipse</span>
+                <span>→</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. SHOP BY CATEGORY */}
+      <section id="categories" className="py-20 px-6 max-w-7xl mx-auto border-b border-white/10">
+        <div className="text-center max-w-xl mx-auto mb-14">
+          <span className="text-[11px] uppercase tracking-[0.4em] text-[#999999] block mb-2">
+            Categories
+          </span>
+          <h2 className="text-3xl md:text-4xl font-serif uppercase tracking-[0.2em] text-white">
+            Designed For Every Silhouette
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+          {IMAGES.categories.map((cat, idx) => (
+            <div
+              key={idx}
+              onClick={() => {
+                if (cat.name !== "Haute Joaillerie") {
+                  setActiveCategory(cat.name);
+                }
+                const el = document.getElementById("shop");
+                if (el) el.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="group cursor-pointer relative border border-white/10 overflow-hidden bg-neutral-950 hover:border-[#C0C0C0] transition-colors"
+            >
+              <div className="aspect-[3/4] relative overflow-hidden">
                 <img
                   src={cat.image}
                   alt={cat.name}
-                  className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110 filter brightness-75 group-hover:brightness-90"
-                  loading="lazy"
+                  className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 filter brightness-90"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
-                <div className="absolute top-4 right-4 text-[10px] uppercase tracking-[0.25em] px-3 py-1 bg-black/70 backdrop-blur-md border border-[#C0C0C0]/25 text-[#C0C0C0]">
-                  {cat.count}
-                </div>
-
-                <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 flex flex-col justify-end">
-                  <span className="text-xs uppercase tracking-[0.25em] text-[#C0C0C0] mb-1">
-                    Fine Silversmithing
-                  </span>
-                  <h3 className="font-serif text-3xl sm:text-4xl font-light text-white mb-2">
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4">
+                  <h3 className="font-serif text-lg md:text-xl tracking-[0.15em] uppercase text-white group-hover:text-[#C0C0C0] transition-colors">
                     {cat.name}
                   </h3>
-                  <p className="text-xs text-neutral-300 font-light mb-4 opacity-80 group-hover:opacity-100 transition-opacity">
-                    {cat.subtitle}
-                  </p>
-                  <div className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-[#C0C0C0] group-hover:text-white transition-colors">
-                    <span>Explore Category</span>
-                    <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                    </svg>
-                  </div>
+                  <span className="text-[10px] uppercase tracking-[0.2em] text-[#909090]">
+                    {cat.count}
+                  </span>
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* 6. FEATURED PRODUCTS */}
-      <section id="products" className="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 relative z-10 border-t border-[#C0C0C0]/15">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 sm:mb-16 pb-6 border-b border-[#C0C0C0]/15 gap-6">
-            <div>
-              <span className="text-xs uppercase tracking-[0.3em] text-[#C0C0C0] block mb-2">
-                Precious Artifacts
-              </span>
-              <h2 className="font-serif text-3xl sm:text-5xl font-light text-white tracking-tight">
-                Featured Products
-              </h2>
-            </div>
-
-            <div className="flex items-center space-x-2 sm:space-x-3 overflow-x-auto pb-2 md:pb-0">
-              {['All', 'Rings', 'Earrings', 'Necklaces'].map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setSelectedCategoryFilter(tab)}
-                  className={`px-4 py-2.5 text-xs uppercase tracking-[0.2em] transition-all duration-300 whitespace-nowrap ${
-                    selectedCategoryFilter === tab
-                      ? 'bg-[#C0C0C0] text-black font-semibold'
-                      : 'border border-[#C0C0C0]/20 text-neutral-400 hover:text-white hover:border-[#C0C0C0]/60'
-                  }`}
-                >
-                  {tab}
-                </button>
-              ))}
-            </div>
+      {/* 7. FEATURED PRODUCTS & NEW ARRIVALS */}
+      <section id="shop" className="py-24 px-6 max-w-7xl mx-auto border-b border-white/10">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
+          <div>
+            <span className="text-[11px] uppercase tracking-[0.4em] text-[#999999] block mb-2">
+              New Arrivals
+            </span>
+            <h2 className="text-3xl md:text-5xl font-serif uppercase tracking-[0.2em] text-white">
+              The Cosmic Collection
+            </h2>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredProducts.map((prod) => (
-              <div
-                key={prod.id}
-                className="group relative flex flex-col justify-between bg-neutral-950/40 border border-[#C0C0C0]/15 p-5 sm:p-6 transition-all duration-500 hover:border-[#C0C0C0]/60 hover:-translate-y-1 hover:shadow-[0_15px_30px_rgba(0,0,0,0.8),0_0_20px_rgba(192,192,192,0.1)]"
+          {/* Filter Tabs */}
+          <div className="flex flex-wrap gap-2 mt-6 md:mt-0">
+            {["All", "Rings", "Earrings", "Necklaces"].map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className={`px-4 py-2 text-xs uppercase tracking-[0.25em] transition-all cursor-pointer ${
+                  activeCategory === cat
+                    ? "bg-white text-black font-semibold"
+                    : "border border-white/20 text-[#A0A0A0] hover:text-white hover:border-white/50"
+                }`}
               >
-                <div className="relative w-full aspect-square overflow-hidden bg-neutral-900 mb-5">
-                  <img
-                    src={prod.image}
-                    alt={prod.name}
-                    className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-108 filter brightness-95 group-hover:brightness-105"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none"></div>
-
-                  <div className="absolute top-3 left-3 px-2.5 py-1 bg-black/80 backdrop-blur-md border border-[#C0C0C0]/30 text-[9px] uppercase tracking-[0.2em] text-[#C0C0C0]">
-                    {prod.badge}
-                  </div>
-
-                  <div className="absolute inset-x-3 bottom-3 hidden sm:flex opacity-0 group-hover:opacity-100 transition-opacity duration-300 gap-2">
-                    <button
-                      onClick={() => addToCart(prod)}
-                      className="flex-1 py-2.5 bg-black/90 backdrop-blur-md border border-[#C0C0C0]/50 text-white text-[10px] uppercase tracking-[0.2em] font-medium hover:bg-white hover:text-black hover:border-white transition-all duration-200"
-                    >
-                      Quick Add
-                    </button>
-                    <button
-                      onClick={() => setSelectedProduct(prod)}
-                      className="px-3 py-2.5 bg-black/90 backdrop-blur-md border border-[#C0C0C0]/50 text-[#C0C0C0] text-[10px] hover:text-white transition-colors"
-                      title="Quick View"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-
-                <div className="flex flex-col flex-grow">
-                  <div className="flex items-center justify-between text-[11px] uppercase tracking-[0.15em] text-[#C0C0C0]/60 mb-1.5">
-                    <span>{prod.category}</span>
-                    <span>{prod.material.split('&')[0]}</span>
-                  </div>
-
-                  <h3 className="font-serif text-xl sm:text-2xl font-light text-white group-hover:text-[#E8E8E8] transition-colors mb-2">
-                    {prod.name}
-                  </h3>
-
-                  <div className="flex items-baseline gap-2 mb-4">
-                    <span className="text-lg font-medium text-white tracking-wide">
-                      ₹{prod.price.toLocaleString('en-IN')}
-                    </span>
-                    <span className="text-xs text-[#C0C0C0]/50 line-through">
-                      ₹{(prod.price + 300).toLocaleString('en-IN')}
-                    </span>
-                    <span className="text-[10px] uppercase tracking-wider text-[#C0C0C0] ml-auto">
-                      Taxes Included
-                    </span>
-                  </div>
-
-                  <p className="text-xs text-neutral-400 font-light line-clamp-2 mb-6">
-                    {prod.description}
-                  </p>
-
-                  <div className="mt-auto pt-4 border-t border-[#C0C0C0]/10 flex gap-2">
-                    <button
-                      onClick={() => setSelectedProduct(prod)}
-                      className="w-full py-3.5 bg-neutral-900/80 border border-[#C0C0C0]/30 text-white text-[11px] uppercase tracking-[0.2em] font-medium transition-all duration-300 hover:border-[#C0C0C0] hover:bg-neutral-800 flex items-center justify-center gap-2"
-                    >
-                      <span>View Details</span>
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </button>
-                    <button
-                      onClick={() => addToCart(prod)}
-                      className="sm:hidden px-4 py-3.5 bg-[#C0C0C0] text-black text-xs uppercase font-semibold"
-                      aria-label="Add to bag"
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
-              </div>
+                {cat}
+              </button>
             ))}
           </div>
         </div>
-      </section>
 
-      {/* 7. BRAND STORY: THE COSMIC EXPERIENCE */}
-      <section id="story" className="py-24 sm:py-32 px-4 sm:px-6 lg:px-8 relative z-10 bg-[#050505] border-t border-[#C0C0C0]/15 overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-[#C0C0C0]/5 rounded-full blur-3xl pointer-events-none"></div>
+        {/* Product Cards Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {filteredProducts.map((product) => (
+            <div
+              key={product.id}
+              className="group border border-white/10 bg-[#080808] hover:border-[#C0C0C0]/50 transition-all flex flex-col justify-between"
+            >
+              <div className="relative aspect-square overflow-hidden bg-neutral-900">
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                />
+                
+                {/* Badges */}
+                <div className="absolute top-3 left-3 text-[9px] uppercase tracking-[0.2em] bg-black/80 backdrop-blur-md px-2.5 py-1 border border-white/15 text-[#D0D0D0]">
+                  {product.tag}
+                </div>
 
-        <div className="max-w-5xl mx-auto relative z-10 text-center">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full border border-[#C0C0C0]/30 mb-8 bg-black/60">
-            <span className="w-3 h-3 rounded-full bg-gradient-to-tr from-[#999999] via-[#C0C0C0] to-white shadow-[0_0_12px_#C0C0C0]"></span>
-          </div>
+                {/* Quick Action Overlay (Desktop) */}
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 p-4">
+                  <button
+                    onClick={() => setSelectedProduct(product)}
+                    className="px-4 py-2.5 bg-black/90 border border-white/30 text-white text-xs uppercase tracking-widest hover:bg-white hover:text-black transition-colors"
+                  >
+                    Quick View
+                  </button>
+                  <button
+                    onClick={() => addToCart(product)}
+                    className="px-4 py-2.5 chrome-button text-xs uppercase tracking-widest font-semibold"
+                  >
+                    Add To Bag
+                  </button>
+                </div>
+              </div>
 
-          <span className="text-xs uppercase tracking-[0.3em] text-[#C0C0C0] block mb-3">
-            Our Philosophy
-          </span>
+              {/* Product Info */}
+              <div className="p-6 flex-1 flex flex-col justify-between">
+                <div>
+                  <div className="text-[10px] uppercase tracking-[0.25em] text-[#808080] mb-1">
+                    {product.collection} Series • {product.category}
+                  </div>
+                  <h3 className="font-serif text-xl tracking-[0.1em] text-white uppercase mb-2 group-hover:text-[#C0C0C0] transition-colors">
+                    {product.name}
+                  </h3>
+                  <p className="text-xs text-[#909090] tracking-wide mb-4 font-light">
+                    {product.material}
+                  </p>
+                </div>
 
-          <h2 className="font-serif text-3xl sm:text-5xl md:text-6xl font-light text-white tracking-tight mb-8">
-            The Cosmic Experience
-          </h2>
-
-          <div className="max-w-3xl mx-auto space-y-6 text-neutral-300 font-light text-base sm:text-lg leading-relaxed sm:leading-loose">
-            <p>
-              At Cosmic, we operate at the poetic intersection of cosmic geometry and contemporary haute joaillerie.
-              Inspired by the eternal motion of celestial orbits and the quiet brilliance of lunar light, each piece
-              is meticulously conceived for those who carry quiet strength and effortless refinement.
-            </p>
-            <p className="text-neutral-400 text-sm sm:text-base">
-              Every creation is forged from ethically reclaimed 925 sterling silver, hand-beveled by master artisans,
-              and layered with a signature liquid-chrome finish. We believe modern luxury should be personal,
-              sculptural, and timeless—an enduring talisman that tells your singular story across any room.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-14 pt-14 border-t border-[#C0C0C0]/15 text-left">
-            <div className="p-4 border border-[#C0C0C0]/15 bg-black/40 backdrop-blur-sm">
-              <span className="text-xs font-serif text-[#C0C0C0] block mb-1">01 / Metallurgy</span>
-              <h4 className="text-xs sm:text-sm font-semibold text-white uppercase tracking-wider mb-1">Pure 925 Silver</h4>
-              <p className="text-[11px] sm:text-xs text-neutral-400 font-light">Hypoallergenic & tarnish-resistant rhodium protective shield.</p>
+                <div className="pt-4 border-t border-white/5 flex items-center justify-between">
+                  <span className="font-mono text-sm tracking-wider text-white">
+                    ${product.price}.00
+                  </span>
+                  <button
+                    onClick={() => addToCart(product)}
+                    className="md:hidden text-xs uppercase tracking-[0.2em] text-[#C0C0C0] hover:text-white"
+                  >
+                    + Bag
+                  </button>
+                </div>
+              </div>
             </div>
-            <div className="p-4 border border-[#C0C0C0]/15 bg-black/40 backdrop-blur-sm">
-              <span className="text-xs font-serif text-[#C0C0C0] block mb-1">02 / Artistry</span>
-              <h4 className="text-xs sm:text-sm font-semibold text-white uppercase tracking-wider mb-1">Hand-Polished</h4>
-              <p className="text-[11px] sm:text-xs text-neutral-400 font-light">Multi-stage mirror chrome luster executed by artisan jewelers.</p>
-            </div>
-            <div className="p-4 border border-[#C0C0C0]/15 bg-black/40 backdrop-blur-sm">
-              <span className="text-xs font-serif text-[#C0C0C0] block mb-1">03 / Presentation</span>
-              <h4 className="text-xs sm:text-sm font-semibold text-white uppercase tracking-wider mb-1">Obsidian Case</h4>
-              <p className="text-[11px] sm:text-xs text-neutral-400 font-light">Custom archival velvet interior presentation box with certificate.</p>
-            </div>
-            <div className="p-4 border border-[#C0C0C0]/15 bg-black/40 backdrop-blur-sm">
-              <span className="text-xs font-serif text-[#C0C0C0] block mb-1">04 / Assurance</span>
-              <h4 className="text-xs sm:text-sm font-semibold text-white uppercase tracking-wider mb-1">Lifetime Care</h4>
-              <p className="text-[11px] sm:text-xs text-neutral-400 font-light">Complimentary polish and structural integrity guarantee forever.</p>
-            </div>
-          </div>
+          ))}
         </div>
       </section>
 
-      {/* 8. FOOTER */}
-      <footer className="border-t border-[#C0C0C0]/20 bg-[#020202]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 mb-14">
-            <div className="lg:col-span-2 space-y-4">
-              <span className="text-2xl font-serif tracking-[0.3em] uppercase text-white block">
-                COSMIC
+      {/* 8. BRAND STORY & CRAFTSMANSHIP (THE MAISON) */}
+      <section id="maison" className="py-24 px-6 max-w-7xl mx-auto border-b border-white/10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          
+          <div className="lg:col-span-5 relative">
+            <div className="aspect-[4/5] border border-white/20 relative overflow-hidden bg-neutral-900">
+              <img
+                src={IMAGES.craftsmanship}
+                alt="COSMIC Atelier Craftsmanship"
+                className="w-full h-full object-cover filter brightness-90 contrast-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
+            </div>
+            <div className="hidden sm:block absolute -bottom-6 -right-6 bg-black border border-[#C0C0C0]/50 p-6 backdrop-blur-md max-w-xs shadow-2xl">
+              <span className="text-[10px] uppercase tracking-[0.3em] text-[#888888] block mb-1">
+                Artisanal Milan
               </span>
-              <p className="text-xs text-neutral-400 font-light max-w-sm leading-relaxed">
-                Sculptural fine jewelry and modern silver artifacts forged with celestial precision. Designed to be worn with poise across the cosmos.
+              <p className="text-xs text-[#C0C0C0] font-light leading-relaxed">
+                Every piece is hand-cast, buffed, and stamped with our registered hallmark at our private workshop in Northern Italy.
               </p>
-              <div className="pt-2 flex items-center space-x-3">
-                <a href="#instagram" aria-label="Instagram" className="w-8 h-8 rounded-full border border-[#C0C0C0]/20 flex items-center justify-center text-neutral-400 hover:text-white hover:border-[#C0C0C0] transition-all">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
-                  </svg>
-                </a>
-                <a href="#pinterest" aria-label="Pinterest" className="w-8 h-8 rounded-full border border-[#C0C0C0]/20 flex items-center justify-center text-neutral-400 hover:text-white hover:border-[#C0C0C0] transition-all">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 0c-6.627 0-12 5.372-12 12 0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738.098.119.112.224.083.345-.09.375-.291 1.199-.332 1.357-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.631-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146 1.124.347 2.317.535 3.554.535 6.627 0 12-5.373 12-12 0-6.628-5.373-12-12-12z" />
-                  </svg>
-                </a>
-                <a href="#x" aria-label="X" className="w-8 h-8 rounded-full border border-[#C0C0C0]/20 flex items-center justify-center text-neutral-400 hover:text-white hover:border-[#C0C0C0] transition-all">
-                  <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                  </svg>
-                </a>
-              </div>
-            </div>
-
-            <div>
-              <h4 className="text-xs uppercase tracking-[0.25em] text-white font-medium mb-4">
-                Collections
-              </h4>
-              <ul className="space-y-2.5 text-xs font-light">
-                <li><a href="#collections" className="hover:text-[#C0C0C0] transition-colors">Lunar Collection</a></li>
-                <li><a href="#collections" className="hover:text-[#C0C0C0] transition-colors">Nova Collection</a></li>
-                <li><a href="#collections" className="hover:text-[#C0C0C0] transition-colors">Eclipse Collection</a></li>
-                <li><a href="#products" className="hover:text-[#C0C0C0] transition-colors">New Arrivals</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-xs uppercase tracking-[0.25em] text-white font-medium mb-4">
-                Client Care
-              </h4>
-              <ul className="space-y-2.5 text-xs font-light">
-                <li><a href="#story" className="hover:text-[#C0C0C0] transition-colors">Size Guide & Fit</a></li>
-                <li><a href="#story" className="hover:text-[#C0C0C0] transition-colors">Silver Care & Polish</a></li>
-                <li><a href="#story" className="hover:text-[#C0C0C0] transition-colors">Insured Shipping</a></li>
-                <li><a href="#story" className="hover:text-[#C0C0C0] transition-colors">Certificate of Authenticity</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-xs uppercase tracking-[0.25em] text-white font-medium mb-4">
-                The Maison
-              </h4>
-              <ul className="space-y-2.5 text-xs font-light">
-                <li><a href="#story" className="hover:text-[#C0C0C0] transition-colors">Heritage</a></li>
-                <li><a href="#story" className="hover:text-[#C0C0C0] transition-colors">Artisanship</a></li>
-                <li><a href="#story" className="hover:text-[#C0C0C0] transition-colors">Sustainability</a></li>
-                <li><a href="#story" className="hover:text-[#C0C0C0] transition-colors">Private Boutiques</a></li>
-              </ul>
             </div>
           </div>
 
-          <div className="pt-8 border-t border-[#C0C0C0]/15 flex flex-col sm:flex-row items-center justify-between text-xs text-[#C0C0C0]/60 font-light gap-4">
-            <div className="text-center sm:text-left">
-              © 2026 Cosmic. All rights reserved.
+          <div className="lg:col-span-7 lg:pl-8">
+            <span className="text-[11px] uppercase tracking-[0.4em] text-[#999999] block mb-3">
+              The Cosmic Philosophy
+            </span>
+            <h2 className="text-3xl sm:text-5xl font-serif uppercase tracking-[0.18em] leading-tight text-white mb-6">
+              Alchemical Perfection Meets Cosmic Geometry
+            </h2>
+            <p className="text-sm sm:text-base text-[#B0B0B0] font-light leading-relaxed tracking-wide mb-10">
+              COSMIC was born from the desire to create jewelry that feels both ancient and futuristic. We reject disposable fashion in favor of timeless heirloom metals—transforming recycled sterling silver into sculpted celestial artifacts.
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+              <div className="border-l border-[#C0C0C0]/30 pl-5">
+                <span className="text-xs uppercase tracking-[0.25em] text-white font-semibold block mb-2">
+                  01. Solid 925 & Platinum
+                </span>
+                <p className="text-xs text-[#8E8E8E] leading-relaxed">
+                  Crafted exclusively with certified solid sterling silver, fortified with a rare liquid platinum bath to prevent dullness.
+                </p>
+              </div>
+
+              <div className="border-l border-[#C0C0C0]/30 pl-5">
+                <span className="text-xs uppercase tracking-[0.25em] text-white font-semibold block mb-2">
+                  02. Ethical Gemology
+                </span>
+                <p className="text-xs text-[#8E8E8E] leading-relaxed">
+                  Every accent stone is cultured in zero-emission laboratories, achieving higher fire and dispersion than mined counterparts.
+                </p>
+              </div>
+
+              <div className="border-l border-[#C0C0C0]/30 pl-5">
+                <span className="text-xs uppercase tracking-[0.25em] text-white font-semibold block mb-2">
+                  03. Hand-Finished Edges
+                </span>
+                <p className="text-xs text-[#8E8E8E] leading-relaxed">
+                  Trained artisans polish each bevel across seven distinct grits, yielding the signature COSMIC liquid chrome mirror sheen.
+                </p>
+              </div>
+
+              <div className="border-l border-[#C0C0C0]/30 pl-5">
+                <span className="text-xs uppercase tracking-[0.25em] text-white font-semibold block mb-2">
+                  04. Lifetime Warranty
+                </span>
+                <p className="text-xs text-[#8E8E8E] leading-relaxed">
+                  Our commitment to haute joaillerie means lifetime complimentary refinishing, ultrasonic cleaning, and prong inspection.
+                </p>
+              </div>
             </div>
-            <div className="flex items-center space-x-6 text-[10px] uppercase tracking-widest text-[#C0C0C0]/40">
-              <a href="#" className="hover:text-[#C0C0C0] transition-colors">Privacy</a>
-              <span>•</span>
-              <a href="#" className="hover:text-[#C0C0C0] transition-colors">Terms</a>
-              <span>•</span>
-              <a href="#" className="hover:text-[#C0C0C0] transition-colors">Hallmark Certification</a>
+          </div>
+
+        </div>
+      </section>
+
+      {/* 9. NEWSLETTER / THE CIRCLE */}
+      <section className="py-20 px-6 max-w-4xl mx-auto text-center">
+        <span className="text-[11px] uppercase tracking-[0.4em] text-[#999999] block mb-3">
+          Private Access
+        </span>
+        <h2 className="text-3xl md:text-5xl font-serif uppercase tracking-[0.2em] text-white mb-4">
+          Join The Cosmic Circle
+        </h2>
+        <p className="text-xs md:text-sm text-[#A0A0A0] font-light max-w-lg mx-auto tracking-wide leading-relaxed mb-8">
+          Subscribers receive private access to limited edition drops, bespoke sizing invitations, and seasonal archival exhibitions.
+        </p>
+
+        {newsletterSubscribed ? (
+          <div className="bg-[#111111] border border-[#C0C0C0]/50 py-4 px-6 max-w-md mx-auto text-xs uppercase tracking-[0.25em] text-[#E0E0E0]">
+            Welcome to the Circle. Confirmation sent.
+          </div>
+        ) : (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (newsletterEmail) {
+                setNewsletterSubscribed(true);
+                showToast("Subscribed to The Cosmic Circle");
+              }
+            }}
+            className="flex flex-col sm:flex-row max-w-md mx-auto gap-2"
+          >
+            <input
+              type="email"
+              required
+              value={newsletterEmail}
+              onChange={(e) => setNewsletterEmail(e.target.value)}
+              placeholder="Enter your email address"
+              className="flex-1 bg-[#0A0A0A] border border-white/20 px-4 py-3.5 text-xs text-white placeholder-[#666666] tracking-widest focus:outline-none focus:border-[#C0C0C0]"
+            />
+            <button
+              type="submit"
+              className="px-8 py-3.5 chrome-button text-xs uppercase tracking-[0.3em] font-semibold cursor-pointer"
+            >
+              Join
+            </button>
+          </form>
+        )}
+      </section>
+
+      {/* 10. LUXURY FOOTER */}
+      <footer className="bg-[#050505] border-t border-white/10 pt-16 pb-12 px-6">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 mb-16">
+          
+          <div className="lg:col-span-2">
+            <span className="font-serif text-3xl tracking-[0.32em] uppercase chrome-gradient-text block mb-4">
+              COSMIC
+            </span>
+            <p className="text-xs text-[#808080] font-light leading-relaxed max-w-sm tracking-wide mb-6">
+              Fine celestial accessories sculpted from high-purity recycled sterling silver, liquid rhodium, and platinum. Designed for everyday elevation and eternal wear.
+            </p>
+            <div className="text-[11px] uppercase tracking-[0.25em] text-[#606060]">
+              Ateliers: Milan • Paris • New York • Tokyo
             </div>
+          </div>
+
+          <div>
+            <h4 className="text-xs uppercase tracking-[0.3em] text-white font-semibold mb-5">
+              Collections
+            </h4>
+            <ul className="space-y-3 text-xs tracking-wider text-[#888888]">
+              <li><a href="#collections" className="hover:text-white transition-colors">Lunar Series</a></li>
+              <li><a href="#collections" className="hover:text-white transition-colors">Nova Series</a></li>
+              <li><a href="#collections" className="hover:text-white transition-colors">Eclipse Series</a></li>
+              <li><a href="#shop" className="hover:text-white transition-colors">Haute Joaillerie</a></li>
+              <li><a href="#shop" className="hover:text-white transition-colors">Bespoke Inquiries</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-xs uppercase tracking-[0.3em] text-white font-semibold mb-5">
+              Client Care
+            </h4>
+            <ul className="space-y-3 text-xs tracking-wider text-[#888888]">
+              <li><a href="#" className="hover:text-white transition-colors">Complimentary Shipping</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Ring Size Atelier</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Lifetime Refinishing</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Certificate of Origin</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Concierge Contact</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-xs uppercase tracking-[0.3em] text-white font-semibold mb-5">
+              The Maison
+            </h4>
+            <ul className="space-y-3 text-xs tracking-wider text-[#888888]">
+              <li><a href="#maison" className="hover:text-white transition-colors">Our Philosophy</a></li>
+              <li><a href="#maison" className="hover:text-white transition-colors">Ethical Sourcing</a></li>
+              <li><a href="#maison" className="hover:text-white transition-colors">Sustainable 925</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Press & Editorial</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Careers at COSMIC</a></li>
+            </ul>
+          </div>
+
+        </div>
+
+        <div className="max-w-7xl mx-auto pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between text-[11px] uppercase tracking-[0.2em] text-[#606060]">
+          <div>
+            © {new Date().getFullYear()} COSMIC HAUTE JOAILLERIE S.P.A. ALL RIGHTS RESERVED.
+          </div>
+          <div className="flex gap-6 mt-4 md:mt-0">
+            <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
+            <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+            <a href="#" className="hover:text-white transition-colors">Cookie Preferences</a>
           </div>
         </div>
       </footer>
 
-      {/* QUICK VIEW MODAL */}
+      {/* 11. QUICK VIEW PRODUCT MODAL */}
       {selectedProduct && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/85 backdrop-blur-md">
-          <div className="relative w-full max-w-3xl bg-[#0c0c0c] border border-[#C0C0C0]/40 overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.95)] max-h-[90vh] flex flex-col md:flex-row">
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="relative bg-[#0a0a0a] border border-[#C0C0C0]/50 max-w-3xl w-full p-6 sm:p-8 overflow-hidden shadow-2xl animate-fade-in">
             <button
               onClick={() => setSelectedProduct(null)}
-              className="absolute top-4 right-4 z-10 p-2 text-neutral-400 hover:text-white transition-colors bg-black/70 rounded-full"
-              aria-label="Close"
+              className="absolute top-4 right-4 text-[#888888] hover:text-white p-2"
+              aria-label="Close modal"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
 
-            <div className="w-full md:w-1/2 aspect-square md:aspect-auto bg-neutral-900 relative">
-              <img src={selectedProduct.image} alt={selectedProduct.name} className="w-full h-full object-cover" />
-              <div className="absolute top-4 left-4 px-2.5 py-1 bg-black/80 backdrop-blur-md border border-[#C0C0C0]/30 text-[10px] uppercase tracking-[0.2em] text-[#C0C0C0]">
-                {selectedProduct.badge}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+              <div className="aspect-square relative overflow-hidden border border-white/10 bg-neutral-900">
+                <img
+                  src={selectedProduct.image}
+                  alt={selectedProduct.name}
+                  className="w-full h-full object-cover"
+                />
               </div>
-            </div>
 
-            <div className="w-full md:w-1/2 p-6 sm:p-8 flex flex-col justify-between overflow-y-auto">
               <div>
-                <span className="text-[10px] uppercase tracking-[0.25em] text-[#C0C0C0] block mb-1">
-                  {selectedProduct.category} • Authentic Creation
+                <span className="text-[10px] uppercase tracking-[0.3em] text-[#888888] block mb-2">
+                  {selectedProduct.collection} Series • {selectedProduct.category}
                 </span>
-                <h3 className="font-serif text-2xl sm:text-3xl font-light text-white mb-2">
+                <h3 className="font-serif text-2xl sm:text-3xl uppercase tracking-[0.15em] text-white mb-3">
                   {selectedProduct.name}
                 </h3>
-                <div className="flex items-baseline gap-3 mb-4">
-                  <span className="text-xl font-medium text-white">
-                    ₹{selectedProduct.price.toLocaleString('en-IN')}
-                  </span>
-                  <span className="text-xs text-neutral-500 line-through">
-                    ₹{(selectedProduct.price + 300).toLocaleString('en-IN')}
-                  </span>
+                <div className="font-mono text-lg text-white mb-4">
+                  ${selectedProduct.price}.00 USD
                 </div>
-
-                <p className="text-xs text-neutral-300 font-light leading-relaxed mb-6">
+                <p className="text-xs text-[#B0B0B0] font-light leading-relaxed mb-6">
                   {selectedProduct.description}
                 </p>
 
-                <div className="space-y-2 border-t border-b border-[#C0C0C0]/15 py-4 mb-6 text-xs text-neutral-400">
+                <div className="space-y-3 mb-8 text-xs text-[#909090] border-t border-b border-white/10 py-4">
                   <div className="flex justify-between">
-                    <span className="uppercase tracking-wider">Metal:</span>
-                    <span className="text-white font-medium">{selectedProduct.material}</span>
+                    <span>Composition</span>
+                    <span className="text-white">{selectedProduct.material}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="uppercase tracking-wider">Finish:</span>
-                    <span className="text-white font-medium">{selectedProduct.finish}</span>
+                    <span>Origin</span>
+                    <span className="text-white">Milanese Atelier</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="uppercase tracking-wider">Hallmark:</span>
-                    <span className="text-white font-medium">925 Laser Inscribed</span>
+                    <span>Packaging</span>
+                    <span className="text-white">Velvet Monolith Box</span>
                   </div>
                 </div>
-              </div>
 
-              <div className="space-y-3">
-                <button
-                  onClick={() => {
-                    addToCart(selectedProduct);
-                    setSelectedProduct(null);
-                  }}
-                  className="w-full py-4 bg-[#C0C0C0] text-black text-xs uppercase tracking-[0.25em] font-semibold hover:bg-white transition-all flex items-center justify-center gap-2"
-                >
-                  <span>Add To Bag — ₹{selectedProduct.price.toLocaleString('en-IN')}</span>
-                </button>
-                <p className="text-[10px] text-center text-neutral-500 uppercase tracking-widest">
-                  Includes Signature Velvet Case & Certificate
-                </p>
+                <div className="flex gap-4">
+                  <button
+                    onClick={() => {
+                      addToCart(selectedProduct);
+                      setSelectedProduct(null);
+                    }}
+                    className="flex-1 py-3.5 chrome-button text-xs uppercase tracking-[0.3em] font-semibold"
+                  >
+                    Add To Bag
+                  </button>
+                  <button
+                    onClick={() => setSelectedProduct(null)}
+                    className="px-6 py-3.5 border border-white/20 text-xs uppercase tracking-widest text-[#A0A0A0] hover:text-white"
+                  >
+                    Close
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* SHOPPING BAG SLIDE-OVER DRAWER */}
-      {isCartOpen && (
+      {/* 12. SHOPPING BAG SLIDE-OVER DRAWER */}
+      {cartOpen && (
         <div className="fixed inset-0 z-50 overflow-hidden">
-          <div onClick={() => setIsCartOpen(false)} className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity"></div>
+          <div
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
+            onClick={() => setCartOpen(false)}
+          />
+
           <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
-            <div className="w-screen max-w-md bg-[#0a0a0a] border-l border-[#C0C0C0]/20 p-6 sm:p-8 flex flex-col justify-between shadow-2xl">
-              <div className="flex items-center justify-between pb-6 border-b border-[#C0C0C0]/15">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-[#C0C0C0]"></span>
-                  <h3 className="font-serif text-xl uppercase tracking-[0.2em] text-white">
-                    Shopping Bag
+            <div className="w-screen max-w-md bg-[#0a0a0a] border-l border-white/15 p-6 flex flex-col justify-between shadow-2xl">
+              
+              <div>
+                <div className="flex items-center justify-between pb-6 border-b border-white/10">
+                  <h3 className="font-serif text-2xl uppercase tracking-[0.2em] text-white">
+                    Your Bag ({cartCount})
                   </h3>
-                  <span className="text-xs text-neutral-500">({totalCartCount})</span>
-                </div>
-                <button onClick={() => setIsCartOpen(false)} className="p-1.5 text-neutral-400 hover:text-white transition-colors" aria-label="Close bag">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-
-              <div className="flex-1 overflow-y-auto py-6 space-y-6">
-                {cart.length === 0 ? (
-                  <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-4">
-                    <div className="w-12 h-12 rounded-full border border-[#C0C0C0]/30 flex items-center justify-center text-[#C0C0C0]">
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                      </svg>
-                    </div>
-                    <h4 className="font-serif text-lg text-white">Your Bag is Empty</h4>
-                    <p className="text-xs text-neutral-500 max-w-xs font-light">
-                      Discover our celestial collections and choose your signature talisman.
-                    </p>
-                  </div>
-                ) : (
-                  cart.map((item) => (
-                    <div key={item.id} className="flex gap-4 p-3 border border-[#C0C0C0]/10 bg-neutral-950/60 relative">
-                      <img src={item.image} alt={item.name} className="w-20 h-20 object-cover bg-neutral-900" />
-                      <div className="flex-1 flex flex-col justify-between">
-                        <div>
-                          <div className="flex justify-between items-start">
-                            <h4 className="font-serif text-base text-white">{item.name}</h4>
-                            <button onClick={() => removeFromCart(item.id)} className="text-neutral-500 hover:text-red-400 text-xs transition-colors">
-                              ✕
-                            </button>
-                          </div>
-                          <span className="text-[10px] text-[#C0C0C0] uppercase tracking-wider block">
-                            ₹{item.price.toLocaleString('en-IN')} each
-                          </span>
-                        </div>
-
-                        <div className="flex items-center justify-between pt-2">
-                          <div className="flex items-center border border-[#C0C0C0]/30 text-xs">
-                            <button onClick={() => updateQuantity(item.id, -1)} className="px-2.5 py-1 text-neutral-400 hover:text-white transition-colors">-</button>
-                            <span className="px-2.5 py-1 text-white font-medium">{item.quantity}</span>
-                            <button onClick={() => updateQuantity(item.id, 1)} className="px-2.5 py-1 text-neutral-400 hover:text-white transition-colors">+</button>
-                          </div>
-                          <span className="text-xs font-medium text-white">
-                            ₹{(item.price * item.quantity).toLocaleString('en-IN')}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-
-              {cart.length > 0 && (
-                <div className="pt-6 border-t border-[#C0C0C0]/15 space-y-4">
-                  <div className="space-y-2 text-xs">
-                    <div className="flex justify-between text-neutral-400">
-                      <span>Subtotal</span>
-                      <span className="text-white font-medium">₹{cartSubtotal.toLocaleString('en-IN')}</span>
-                    </div>
-                    <div className="flex justify-between text-neutral-400">
-                      <span>Insured Express Shipping</span>
-                      <span className="text-[#C0C0C0] uppercase tracking-wider text-[10px]">Complimentary</span>
-                    </div>
-                    <div className="flex justify-between text-sm font-semibold text-white pt-2 border-t border-neutral-900">
-                      <span>Total</span>
-                      <span>₹{cartSubtotal.toLocaleString('en-IN')}</span>
-                    </div>
-                  </div>
-
                   <button
-                    onClick={() => triggerToast('Proceeding to encrypted luxury checkout...')}
-                    className="w-full py-4 bg-[#C0C0C0] text-black text-xs uppercase tracking-[0.25em] font-semibold hover:bg-white transition-all flex items-center justify-center gap-2"
+                    onClick={() => setCartOpen(false)}
+                    className="text-[#888888] hover:text-white p-2"
+                    aria-label="Close Bag"
                   >
-                    <span>Checkout Now</span>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
-                  <p className="text-[10px] text-center text-neutral-500 uppercase tracking-widest">
-                    🔒 256-Bit Encrypted Secure Checkout
-                  </p>
                 </div>
-              )}
+
+                {/* Free Shipping Progress */}
+                <div className="py-4 border-b border-white/5">
+                  <div className="flex justify-between text-[11px] uppercase tracking-wider text-[#A0A0A0] mb-2">
+                    <span>
+                      {cartTotal >= 500
+                        ? "Complimentary Worldwide Express Courier Unlocked"
+                        : `Add $${500 - cartTotal} more for Complimentary Courier`}
+                    </span>
+                  </div>
+                  <div className="w-full bg-[#222222] h-1">
+                    <div
+                      className="bg-[#C0C0C0] h-1 transition-all duration-500"
+                      style={{ width: `${Math.min(100, (cartTotal / 500) * 100)}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* Cart Items List */}
+                <div className="divide-y divide-white/5 max-h-[50vh] overflow-y-auto mt-4 pr-1">
+                  {cart.length === 0 ? (
+                    <div className="py-16 text-center text-[#666666] text-xs uppercase tracking-widest">
+                      Your bag is currently empty
+                    </div>
+                  ) : (
+                    cart.map((item) => (
+                      <div key={item.id} className="py-4 flex gap-4 items-center">
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="w-16 h-16 object-cover border border-white/10 bg-neutral-900"
+                        />
+                        <div className="flex-1">
+                          <h4 className="font-serif text-sm uppercase tracking-wider text-white">
+                            {item.name}
+                          </h4>
+                          <span className="text-[10px] uppercase tracking-wider text-[#888888] block">
+                            {item.material}
+                          </span>
+                          <span className="font-mono text-xs text-[#D0D0D0] mt-1 block">
+                            ${item.price}.00
+                          </span>
+                        </div>
+                        <div className="flex items-center border border-white/20">
+                          <button
+                            onClick={() => updateCartQty(item.id, -1)}
+                            className="px-2.5 py-1 text-xs text-[#888888] hover:text-white"
+                          >
+                            -
+                          </button>
+                          <span className="px-2 text-xs font-mono text-white">
+                            {item.quantity}
+                          </span>
+                          <button
+                            onClick={() => updateCartQty(item.id, 1)}
+                            className="px-2.5 py-1 text-xs text-[#888888] hover:text-white"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              {/* Drawer Footer */}
+              <div className="pt-6 border-t border-white/10">
+                <div className="flex justify-between text-xs uppercase tracking-widest text-[#888888] mb-2">
+                  <span>Subtotal</span>
+                  <span className="font-mono text-white text-base">${cartTotal}.00</span>
+                </div>
+                <p className="text-[10px] text-[#666666] uppercase tracking-wider mb-6">
+                  Taxes, duties & insurance calculated at checkout.
+                </p>
+                <button
+                  disabled={cart.length === 0}
+                  onClick={() => showToast("Checkout integration initiated")}
+                  className={`w-full py-4 text-xs uppercase tracking-[0.3em] font-semibold text-center transition-all ${
+                    cart.length === 0
+                      ? "bg-[#222222] text-[#666666] cursor-not-allowed"
+                      : "chrome-button cursor-pointer"
+                  }`}
+                >
+                  Proceed To Checkout
+                </button>
+                <button
+                  onClick={() => setCartOpen(false)}
+                  className="w-full py-2.5 mt-2 text-[10px] uppercase tracking-widest text-[#707070] hover:text-white text-center"
+                >
+                  Continue Browsing
+                </button>
+              </div>
+
             </div>
           </div>
         </div>
       )}
+
     </div>
   );
-};
-
-export default App;
+}
