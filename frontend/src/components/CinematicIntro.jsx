@@ -3,27 +3,27 @@ import cosmicSymbol from '../assets/cosmic_symbol.jpg';
 
 /**
  * Premium Cinematic Intro Sequence for COSMIC (Haute Joaillerie)
- * 
- * Flow:
- * 1. Black screen (0.0s - 0.5s)
- * 2. Thin chrome light streak enters and traces the orbit (0.5s - 1.2s)
- * 3. Orbital ring forms dynamically behind the streak (1.2s - 2.4s)
- * 4. Subtle metallic reflections travel across the ring (2.4s - 3.2s)
- * 5. Four-point celestial star appears last with glint (3.2s - 4.0s)
- * 6. Hold completed logo briefly (4.0s - 4.6s)
- * 7. Fade in text "COSMIC" (4.6s - 5.0s)
- * 8. Gradually increase letter spacing "C O S M I C" (5.0s - 5.6s)
- * 9. Polished chrome reflection sweeps across the text (5.6s - 6.0s)
- * 10. Display tagline "Wear The Universe" (6.0s - 6.6s)
- * 11. Hold composition for 1 second (6.6s - 7.6s)
- * 12. Scale composition slightly smaller & move upward (7.6s - 8.2s)
- * 13. Fade into homepage content (8.0s - 8.8s)
+ * Optimized Pacing (~4.8s total):
+ * 1. Black screen (0.0s - 0.25s)
+ * 2. Thin chrome light streak enters and traces orbit (0.25s - 0.7s)
+ * 3. Orbital ring forms dynamically behind streak (0.7s - 1.35s)
+ * 4. Subtle metallic reflections travel across ring (1.35s - 1.85s)
+ * 5. Four-point celestial star appears with glint (1.85s - 2.3s)
+ * 6. Hold completed logo briefly (2.3s - 2.65s)
+ * 7. Fade in text "COSMIC" (2.65s - 2.95s)
+ * 8. Gradually increase letter spacing "C O S M I C" (2.95s - 3.3s)
+ * 9. Polished chrome reflection sweeps across text (3.3s - 3.6s)
+ * 10. Display tagline "Wear The Universe" (3.6s - 4.0s)
+ * 11. Hold composition (4.0s - 4.5s)
+ * 12. Scale composition slightly smaller & move upward (4.5s - 4.8s)
+ * 13. Fade into homepage content (4.8s - 5.4s)
  */
 export default function CinematicIntro({ onComplete }) {
   const [phase, setPhase] = useState(0);
   const [fadingOut, setFadingOut] = useState(false);
   const timersRef = useRef([]);
   const onCompleteRef = useRef(onComplete);
+
   useEffect(() => {
     onCompleteRef.current = onComplete;
   }, [onComplete]);
@@ -34,7 +34,7 @@ export default function CinematicIntro({ onComplete }) {
     setFadingOut(true);
     setTimeout(() => {
       if (onCompleteRef.current) onCompleteRef.current();
-    }, 450);
+    }, 350);
   }, []);
 
   useEffect(() => {
@@ -49,49 +49,49 @@ export default function CinematicIntro({ onComplete }) {
       return timer;
     };
 
-    // 1. Black screen -> 2. Chrome streak enters
-    addTimer(() => setPhase(1), 500);
+    // 1. Black screen -> 2. Chrome streak enters (250ms)
+    addTimer(() => setPhase(1), 250);
 
-    // 3. Orbital ring forms from streak
-    addTimer(() => setPhase(2), 1200);
+    // 3. Orbital ring forms from streak (700ms)
+    addTimer(() => setPhase(2), 700);
 
-    // 4. Metallic reflection travels across ring
-    addTimer(() => setPhase(3), 2400);
+    // 4. Metallic reflection travels across ring (1350ms)
+    addTimer(() => setPhase(3), 1350);
 
-    // 5. Four-point star appears last
-    addTimer(() => setPhase(4), 3200);
+    // 5. Four-point star appears with glint (1850ms)
+    addTimer(() => setPhase(4), 1850);
 
-    // 6. Hold completed logo briefly
-    addTimer(() => setPhase(5), 4000);
+    // 6. Hold completed logo briefly (2300ms)
+    addTimer(() => setPhase(5), 2300);
 
-    // 7. Fade in text "COSMIC"
-    addTimer(() => setPhase(6), 4600);
+    // 7. Fade in text "COSMIC" (2650ms)
+    addTimer(() => setPhase(6), 2650);
 
-    // 8. Expand letter spacing: C O S M I C
-    addTimer(() => setPhase(7), 5000);
+    // 8. Expand letter spacing: C O S M I C (2950ms)
+    addTimer(() => setPhase(7), 2950);
 
-    // 9. Chrome reflection sweeps across text
-    addTimer(() => setPhase(8), 5600);
+    // 9. Chrome reflection sweeps across text (3300ms)
+    addTimer(() => setPhase(8), 3300);
 
-    // 10. Display tagline: "Wear The Universe"
-    addTimer(() => setPhase(9), 6000);
+    // 10. Display tagline: "Wear The Universe" (3600ms)
+    addTimer(() => setPhase(9), 3600);
 
-    // 11. Hold for 1 second
-    addTimer(() => setPhase(10), 6600);
+    // 11. Hold composition (4000ms)
+    addTimer(() => setPhase(10), 4000);
 
-    // 12. Scale smaller & move upward
-    addTimer(() => setPhase(11), 7600);
+    // 12. Scale smaller & move upward (4500ms)
+    addTimer(() => setPhase(11), 4500);
 
-    // 13. Fade into homepage
+    // 13. Fade into homepage (4800ms)
     addTimer(() => {
       setFadingOut(true);
       setPhase(12);
-    }, 8000);
+    }, 4800);
 
-    // Complete unmount
+    // Complete unmount (5400ms)
     addTimer(() => {
       if (onCompleteRef.current) onCompleteRef.current();
-    }, 8800);
+    }, 5400);
 
     return () => {
       window.removeEventListener('keydown', onKeyDown);
@@ -102,21 +102,21 @@ export default function CinematicIntro({ onComplete }) {
 
   return (
     <div
-      className={`fixed inset-0 z-50 bg-[#000000] flex flex-col items-center justify-center overflow-hidden transition-opacity duration-800 pointer-events-none select-none ${
+      className={`fixed inset-0 z-50 bg-[#000000] flex flex-col items-center justify-center overflow-hidden transition-opacity duration-600 pointer-events-none select-none ${
         fadingOut ? 'opacity-0' : 'opacity-100'
       }`}
       aria-label="Cosmic Brand Cinematic Intro"
     >
-      {/* Subtle Ambient Radial Light (Pure Minimal Luxury) */}
+      {/* Subtle Ambient Radial Light */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_48%,_rgba(255,255,255,0.035)_0%,_transparent_65%)] pointer-events-none" />
 
-      {/* Main Composition: Scales down & moves upward in Phase 11 */}
+      {/* Main Composition Container */}
       <div
-        className="relative z-10 flex flex-col items-center justify-center transition-all duration-900 ease-out"
+        className="relative z-10 flex flex-col items-center justify-center transition-all duration-600 ease-out"
         style={{
           transform:
             phase >= 11
-              ? 'scale(0.92) translateY(-26px)'
+              ? 'scale(0.92) translateY(-24px)'
               : 'scale(1) translateY(0)',
           transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
         }}
@@ -128,7 +128,7 @@ export default function CinematicIntro({ onComplete }) {
           
           {/* Base Emblem Asset */}
           <div
-            className={`relative w-full h-full transition-opacity duration-1000 ease-out ${
+            className={`relative w-full h-full transition-opacity duration-700 ease-out ${
               phase >= 2 ? 'opacity-100' : 'opacity-0'
             }`}
           >
@@ -141,7 +141,7 @@ export default function CinematicIntro({ onComplete }) {
             {/* Black patch over star location during ring-only phases (1, 2, 3) */}
             {phase < 4 && (
               <div
-                className="absolute bg-[#000000] rounded-full pointer-events-none transition-opacity duration-500"
+                className="absolute bg-[#000000] rounded-full pointer-events-none transition-opacity duration-400"
                 style={{
                   top: '40%',
                   left: '52%',
@@ -154,7 +154,7 @@ export default function CinematicIntro({ onComplete }) {
 
             {/* Specular metallic reflection traveling across the ring (Phase 3) */}
             <div
-              className={`absolute inset-0 pointer-events-none overflow-hidden transition-opacity duration-500 ${
+              className={`absolute inset-0 pointer-events-none overflow-hidden transition-opacity duration-400 ${
                 phase === 3 ? 'opacity-100' : 'opacity-0'
               }`}
             >
@@ -162,10 +162,10 @@ export default function CinematicIntro({ onComplete }) {
                 className="w-full h-full"
                 style={{
                   background:
-                    'linear-gradient(115deg, transparent 25%, rgba(255,255,255,0.45) 50%, transparent 75%)',
+                    'linear-gradient(115deg, transparent 25%, rgba(255,255,255,0.5) 50%, transparent 75%)',
                   mixBlendMode: 'color-dodge',
                   transform: phase === 3 ? 'translateX(100%)' : 'translateX(-100%)',
-                  transition: 'transform 0.85s cubic-bezier(0.16, 1, 0.3, 1)',
+                  transition: 'transform 0.55s cubic-bezier(0.16, 1, 0.3, 1)',
                 }}
               />
             </div>
@@ -174,7 +174,7 @@ export default function CinematicIntro({ onComplete }) {
           {/* CHROME LIGHT STREAK SVG (Phases 1 & 2) */}
           <svg
             viewBox="0 0 736 736"
-            className={`absolute inset-0 w-full h-full pointer-events-none transition-opacity duration-500 ${
+            className={`absolute inset-0 w-full h-full pointer-events-none transition-opacity duration-400 ${
               phase >= 1 && phase <= 2 ? 'opacity-100' : 'opacity-0'
             }`}
           >
@@ -194,7 +194,7 @@ export default function CinematicIntro({ onComplete }) {
               </filter>
             </defs>
 
-            {/* Precise tilted ellipse matching orbital trajectory */}
+            {/* Ellipse matching orbital path with snappier stroke animation */}
             <ellipse
               cx="410"
               cy="410"
@@ -207,19 +207,19 @@ export default function CinematicIntro({ onComplete }) {
               strokeLinecap="round"
               filter="url(#streakGlow)"
               style={{
-                strokeDasharray: '260 1200',
+                strokeDasharray: '280 1200',
                 strokeDashoffset:
                   phase === 0 ? '1200' :
-                  phase === 1 ? '750' : // Entering from top right
-                  phase === 2 ? '0' : '0', // Completes the orbit
-                transition: 'stroke-dashoffset 1.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                  phase === 1 ? '750' :
+                  phase === 2 ? '0' : '0',
+                transition: 'stroke-dashoffset 0.75s cubic-bezier(0.16, 1, 0.3, 1)',
               }}
             />
           </svg>
 
-          {/* PINPOINT STAR GLINT (Flashes precisely when star appears in Phase 4) */}
+          {/* PINPOINT STAR GLINT (Phase 4) */}
           <div
-            className={`absolute pointer-events-none transition-all duration-700 ${
+            className={`absolute pointer-events-none transition-all duration-450 ${
               phase === 4
                 ? 'opacity-100 scale-100'
                 : 'opacity-0 scale-50'
@@ -231,11 +231,8 @@ export default function CinematicIntro({ onComplete }) {
               transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
             }}
           >
-            {/* Horizontal flare ray */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 sm:w-20 h-[1px] bg-gradient-to-r from-transparent via-white to-transparent" />
-            {/* Vertical flare ray */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-16 sm:h-20 w-[1px] bg-gradient-to-b from-transparent via-white to-transparent" />
-            {/* Central specular highlight */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.95)]" />
           </div>
         </div>
@@ -243,16 +240,16 @@ export default function CinematicIntro({ onComplete }) {
         {/* ========================================================= */}
         {/* BRAND TYPOGRAPHY & EXPANDING KERNING                      */}
         {/* ========================================================= */}
-        <div className="flex flex-col items-center text-center mt-3">
+        <div className="flex flex-col items-center text-center mt-2">
           
           {/* Brand Name "COSMIC" (Phases 6 - 8) */}
           <div
-            className={`transition-opacity duration-600 ease-out relative overflow-hidden ${
+            className={`transition-opacity duration-400 ease-out relative overflow-hidden ${
               phase >= 6 ? 'opacity-100' : 'opacity-0'
             }`}
           >
             <h1
-              className="font-aileron font-normal text-3xl sm:text-4xl md:text-5xl uppercase tracking-[0.2em] transition-all duration-900 chrome-gradient-text select-none"
+              className="font-aileron font-normal text-3xl sm:text-4xl md:text-5xl uppercase tracking-[0.2em] transition-all duration-600 chrome-gradient-text select-none"
               style={{
                 letterSpacing: phase >= 7 ? '0.58em' : '0.2em',
                 transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
@@ -263,7 +260,7 @@ export default function CinematicIntro({ onComplete }) {
 
             {/* Specular Chrome Sweep across text (Phase 8) */}
             <div
-              className={`absolute inset-0 pointer-events-none transition-opacity duration-300 ${
+              className={`absolute inset-0 pointer-events-none transition-opacity duration-250 ${
                 phase >= 8 ? 'opacity-100' : 'opacity-0'
               }`}
             >
@@ -274,7 +271,7 @@ export default function CinematicIntro({ onComplete }) {
                     'linear-gradient(110deg, transparent 25%, rgba(255,255,255,0.7) 50%, transparent 75%)',
                   mixBlendMode: 'color-dodge',
                   transform: phase >= 8 ? 'translateX(120%)' : 'translateX(-120%)',
-                  transition: 'transform 0.75s cubic-bezier(0.16, 1, 0.3, 1)',
+                  transition: 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
                 }}
               />
             </div>
@@ -282,7 +279,7 @@ export default function CinematicIntro({ onComplete }) {
 
           {/* Hairline Divider & Tagline "Wear The Universe" (Phase 9 - 11) */}
           <div
-            className={`transition-all duration-700 ease-out flex flex-col items-center mt-3 ${
+            className={`transition-all duration-500 ease-out flex flex-col items-center mt-3 ${
               phase >= 9
                 ? 'opacity-100 translate-y-0'
                 : 'opacity-0 translate-y-2'
@@ -291,7 +288,7 @@ export default function CinematicIntro({ onComplete }) {
               transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
             }}
           >
-            <div className="w-16 sm:w-20 h-[1px] bg-gradient-to-r from-transparent via-[#C0C0C0]/40 to-transparent mb-3" />
+            <div className="w-16 sm:w-20 h-[1px] bg-gradient-to-r from-transparent via-[#C0C0C0]/40 to-transparent mb-2.5" />
             <p className="font-aileron text-xs sm:text-sm tracking-[0.32em] text-[#A0A0A0] font-light uppercase select-none">
               Wear The Universe
             </p>
