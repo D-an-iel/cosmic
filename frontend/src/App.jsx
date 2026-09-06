@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import heroEditorial from './assets/hero_editorial.jpg';
 import lunarImg from './assets/lunar_collection.jpg';
 import novaImg from './assets/nova_collection.jpg';
 import eclipseImg from './assets/eclipse_collection.jpg';
-import cosmicSymbol from './assets/cosmic_symbol.jpg';
+import CinematicIntro from './components/CinematicIntro.jsx';
 
 // Verified high-resolution luxury jewelry & fashion photography (served locally)
 const IMAGES = {
@@ -90,12 +90,7 @@ const IMAGES = {
 
 export default function App() {
   // State management
-  // Staged luxury loading intro:
-  // Step 1: Cosmic chrome symbol appears (0ms)
-  // Step 2: Brand name smoothly appears below symbol (950ms)
-  // Step 3: Screen smoothly fades out revealing website (2400ms - 3100ms)
-  const [loaderStep, setLoaderStep] = useState(1);
-  const [loaderVisible, setLoaderVisible] = useState(true);
+  const [introActive, setIntroActive] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [cart, setCart] = useState([
@@ -113,27 +108,6 @@ export default function App() {
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [newsletterSubscribed, setNewsletterSubscribed] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
-
-  // Minimal Luxury Loading Sequence
-  useEffect(() => {
-    const nameTimer = setTimeout(() => {
-      setLoaderStep(2);
-    }, 950);
-
-    const fadeTimer = setTimeout(() => {
-      setLoaderStep(3);
-    }, 2400);
-
-    const removeTimer = setTimeout(() => {
-      setLoaderVisible(false);
-    }, 3100);
-
-    return () => {
-      clearTimeout(nameTimer);
-      clearTimeout(fadeTimer);
-      clearTimeout(removeTimer);
-    };
-  }, []);
 
   const showToast = (msg) => {
     setToastMessage(msg);
@@ -190,53 +164,9 @@ export default function App() {
   return (
     <div className="min-h-screen bg-black text-white font-sans selection:bg-[#C0C0C0] selection:text-black antialiased relative">
       
-      {/* 1. LUXURY STAGED LOADING SCREEN (SYMBOL -> NAME -> WEBSITE) */}
-      {loaderVisible && (
-        <div
-          className={`fixed inset-0 z-50 bg-black flex flex-col items-center justify-center transition-opacity duration-700 pointer-events-none ${
-            loaderStep === 3 ? "opacity-0" : "opacity-100"
-          }`}
-        >
-          {/* Ambient Subtle Radial Glow */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.06)_0%,_transparent_65%)] pointer-events-none" />
-
-          <div className="relative z-10 flex flex-col items-center px-6 text-center">
-            {/* Step 1: Cosmic Chrome Emblem */}
-            <div
-              className={`transition-all duration-1000 ease-out transform ${
-                loaderStep >= 1
-                  ? "opacity-100 scale-100 translate-y-0"
-                  : "opacity-0 scale-90 translate-y-2"
-              }`}
-            >
-              <div className="relative flex items-center justify-center">
-                <div className="absolute w-36 h-36 rounded-full bg-white/5 blur-2xl pointer-events-none" />
-                <img
-                  src={cosmicSymbol}
-                  alt="Cosmic Emblem"
-                  className="w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 object-contain mix-blend-screen drop-shadow-[0_0_25px_rgba(255,255,255,0.35)] animate-subtle-float"
-                />
-              </div>
-            </div>
-
-            {/* Step 2: Brand Name (Sentence Case) & Haute Joaillerie */}
-            <div
-              className={`transition-all duration-700 ease-out flex flex-col items-center mt-3 transform ${
-                loaderStep >= 2
-                  ? "opacity-100 translate-y-0"
-                  : "opacity-0 translate-y-3"
-              }`}
-            >
-              <h1 className="font-aileron text-3xl sm:text-4xl md:text-5xl font-light tracking-[0.22em] chrome-gradient-text drop-shadow-[0_0_30px_rgba(192,192,192,0.3)]">
-                Cosmic
-              </h1>
-              <div className="w-16 sm:w-20 h-[1px] bg-gradient-to-r from-transparent via-[#C0C0C0]/50 to-transparent mt-3 mb-2" />
-              <p className="font-aileron text-[9px] sm:text-[10px] tracking-[0.3em] text-[#808080] font-light">
-                Haute joaillerie
-              </p>
-            </div>
-          </div>
-        </div>
+      {/* 1. CINEMATIC LUXURY BRAND INTRO (7-8s) */}
+      {introActive && (
+        <CinematicIntro onComplete={() => setIntroActive(false)} />
       )}
 
       {/* TOAST NOTIFICATION */}
