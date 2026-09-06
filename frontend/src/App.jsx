@@ -220,7 +220,7 @@ export default function App() {
       </div>
 
       {/* 3. STICKY LUXURY NAVBAR */}
-      <header className="sticky top-0 z-40 bg-black/85 backdrop-blur-xl border-b border-white/10 transition-colors duration-300">
+      <header className="sticky top-0 z-40 bg-black/85 backdrop-blur-xl border-b border-white/10 transition-colors duration-300 font-aileron">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           
           {/* Mobile Menu Toggle */}
@@ -239,17 +239,17 @@ export default function App() {
           </button>
 
           {/* Left Navigation (Desktop) */}
-          <nav className="hidden md:flex items-center space-x-10 text-xs uppercase tracking-[0.25em] font-medium text-[#C0C0C0]">
+          <nav className="hidden md:flex items-center space-x-10 text-sm font-normal text-[#C0C0C0] tracking-wide">
             <a href="#collections" className="hover:text-white transition-colors relative py-1 group">
               Collections
               <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-[#C0C0C0] transition-all duration-300 group-hover:w-full" />
             </a>
             <a href="#shop" className="hover:text-white transition-colors relative py-1 group">
-              Fine Jewelry
+              Fine jewelry
               <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-[#C0C0C0] transition-all duration-300 group-hover:w-full" />
             </a>
             <a href="#maison" className="hover:text-white transition-colors relative py-1 group">
-              The Maison
+              The maison
               <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-[#C0C0C0] transition-all duration-300 group-hover:w-full" />
             </a>
           </nav>
@@ -259,16 +259,16 @@ export default function App() {
             href="#"
             className="flex flex-col items-center group cursor-pointer text-center"
           >
-            <span className="font-serif text-2xl md:text-3xl tracking-[0.32em] font-normal uppercase chrome-gradient-text group-hover:opacity-90 transition-opacity">
-              COSMIC
+            <span className="font-aileron text-2xl md:text-3xl tracking-[0.2em] font-normal chrome-gradient-text group-hover:opacity-90 transition-opacity">
+              Cosmic
             </span>
-            <span className="text-[8px] uppercase tracking-[0.4em] text-[#707070] -mt-1 group-hover:text-[#A0A0A0] transition-colors">
-              Haute Joaillerie
+            <span className="text-[9px] tracking-[0.25em] text-[#707070] -mt-0.5 group-hover:text-[#A0A0A0] transition-colors">
+              Haute joaillerie
             </span>
           </a>
 
           {/* Right Navigation / Bag */}
-          <div className="flex items-center space-x-6 text-xs uppercase tracking-[0.2em]">
+          <div className="flex items-center space-x-6 text-sm tracking-wide">
             <a
               href="#shop"
               className="hidden lg:inline text-[#A0A0A0] hover:text-white transition-colors"
@@ -280,7 +280,7 @@ export default function App() {
               className="relative p-2 text-white hover:text-[#C0C0C0] transition-colors flex items-center gap-2 group cursor-pointer"
               aria-label="Shopping Bag"
             >
-              <span className="text-xs uppercase tracking-widest hidden sm:inline text-[#A0A0A0] group-hover:text-white">
+              <span className="text-sm tracking-wide hidden sm:inline text-[#A0A0A0] group-hover:text-white">
                 Bag
               </span>
               <div className="relative">
@@ -299,8 +299,8 @@ export default function App() {
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="md:hidden bg-[#0a0a0a] border-b border-white/10 px-6 py-8 space-y-6">
-            <nav className="flex flex-col space-y-4 text-sm uppercase tracking-[0.25em]">
+          <div className="md:hidden bg-[#0a0a0a] border-b border-white/10 px-6 py-8 space-y-6 font-aileron">
+            <nav className="flex flex-col space-y-4 text-base tracking-wide">
               <a
                 href="#collections"
                 onClick={() => setMobileMenuOpen(false)}
@@ -313,7 +313,7 @@ export default function App() {
                 onClick={() => setMobileMenuOpen(false)}
                 className="text-[#C0C0C0] hover:text-white py-2 border-b border-white/5"
               >
-                Fine Jewelry
+                Fine jewelry
               </a>
               <a
                 href="#categories"
@@ -327,10 +327,10 @@ export default function App() {
                 onClick={() => setMobileMenuOpen(false)}
                 className="text-[#C0C0C0] hover:text-white py-2 border-b border-white/5"
               >
-                The Maison & Craft
+                The maison & craft
               </a>
             </nav>
-            <div className="pt-4 text-xs tracking-widest text-[#707070] uppercase">
+            <div className="pt-4 text-xs tracking-wider text-[#707070]">
               Boutiques: Milan • Paris • New York • Tokyo
             </div>
           </div>
@@ -359,8 +359,8 @@ export default function App() {
             </span>
           </div>
 
-          <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-serif font-light uppercase tracking-[0.18em] leading-tight mb-6 chrome-gradient-text drop-shadow-[0_15px_30px_rgba(0,0,0,0.9)]">
-            Wear The Universe
+          <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-aileron font-light tracking-[0.04em] leading-tight mb-6 chrome-gradient-text drop-shadow-[0_15px_30px_rgba(0,0,0,0.9)]">
+            Wear the universe
           </h1>
 
           <p className="max-w-2xl mx-auto text-base sm:text-lg md:text-xl text-[#C0C0C0] font-light tracking-wide leading-relaxed mb-12">
