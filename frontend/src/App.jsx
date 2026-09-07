@@ -4,6 +4,7 @@ import lunarImg from './assets/lunar_collection.jpg';
 import novaImg from './assets/nova_collection.jpg';
 import eclipseImg from './assets/eclipse_collection.jpg';
 import CinematicIntro from './components/CinematicIntro.jsx';
+import ProductDetails from './components/ProductDetails.jsx';
 
 // Verified high-resolution luxury jewelry & fashion photography (served locally)
 const IMAGES = {
@@ -14,12 +15,12 @@ const IMAGES = {
   products: [
     {
       id: 1,
-      name: "The Solstice Signet Ring",
+      name: "Lunar Silver Ring",
       collection: "Lunar",
       category: "Rings",
-      price: 340,
-      material: "925 Solid Silver • Hand Polished",
-      tag: "Best Seller",
+      price: 799,
+      material: "925 Solid Silver • Liquid Rhodium Dip",
+      tag: "Flagship",
       image: lunarImg,
       description: "Cast in solid 925 sterling silver with a sculpted celestial bevel. Individually hand-finished in our Milanese atelier."
     },
@@ -91,15 +92,16 @@ const IMAGES = {
 export default function App() {
   // State management
   const [introActive, setIntroActive] = useState(true);
+  const [currentView, setCurrentView] = useState('home'); // 'home' | 'product'
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [cart, setCart] = useState([
     {
-      id: 1,
-      name: "The Solstice Signet Ring",
-      price: 340,
+      id: "lunar-silver-ring",
+      name: "Lunar Silver Ring",
+      price: 799,
       quantity: 1,
-      material: "925 Solid Silver",
+      material: "Solid 925 Silver • Rhodium Dip",
       image: lunarImg
     }
   ]);
@@ -205,23 +207,61 @@ export default function App() {
 
           {/* Left Navigation (Desktop) */}
           <nav className="hidden md:flex items-center space-x-10 text-sm font-normal text-[#C0C0C0] tracking-wide">
-            <a href="#collections" className="hover:text-white transition-colors relative py-1 group">
+            <button
+              onClick={() => {
+                setCurrentView('home');
+                const el = document.getElementById("collections");
+                if (el) el.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="hover:text-white transition-colors relative py-1 group cursor-pointer"
+            >
               Collections
               <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-[#C0C0C0] transition-all duration-300 group-hover:w-full" />
-            </a>
-            <a href="#shop" className="hover:text-white transition-colors relative py-1 group">
+            </button>
+            <button
+              onClick={() => {
+                setCurrentView('product');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className={`transition-colors relative py-1 group cursor-pointer ${
+                currentView === 'product' ? 'text-white font-medium' : 'hover:text-white'
+              }`}
+            >
+              Lunar Ring (₹799)
+              <span className={`absolute bottom-0 left-0 h-[1px] bg-[#C0C0C0] transition-all duration-300 ${
+                currentView === 'product' ? 'w-full' : 'w-0 group-hover:w-full'
+              }`} />
+            </button>
+            <button
+              onClick={() => {
+                setCurrentView('home');
+                const el = document.getElementById("shop");
+                if (el) el.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="hover:text-white transition-colors relative py-1 group cursor-pointer"
+            >
               Fine jewelry
               <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-[#C0C0C0] transition-all duration-300 group-hover:w-full" />
-            </a>
-            <a href="#maison" className="hover:text-white transition-colors relative py-1 group">
+            </button>
+            <button
+              onClick={() => {
+                setCurrentView('home');
+                const el = document.getElementById("maison");
+                if (el) el.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="hover:text-white transition-colors relative py-1 group cursor-pointer"
+            >
               The maison
               <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-[#C0C0C0] transition-all duration-300 group-hover:w-full" />
-            </a>
+            </button>
           </nav>
 
           {/* Center Brand Logo */}
-          <a
-            href="#"
+          <button
+            onClick={() => {
+              setCurrentView('home');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
             className="flex flex-col items-center group cursor-pointer text-center"
           >
             <span className="font-aileron text-2xl md:text-3xl tracking-[0.2em] font-normal chrome-gradient-text group-hover:opacity-90 transition-opacity">
@@ -230,7 +270,7 @@ export default function App() {
             <span className="text-[9px] tracking-[0.25em] text-[#707070] -mt-0.5 group-hover:text-[#A0A0A0] transition-colors">
               Haute joaillerie
             </span>
-          </a>
+          </button>
 
           {/* Right Navigation / Bag */}
           <div className="flex items-center space-x-6 text-sm tracking-wide">
@@ -266,30 +306,52 @@ export default function App() {
         {mobileMenuOpen && (
           <div className="md:hidden bg-[#0a0a0a] border-b border-white/10 px-6 py-8 space-y-6 font-aileron">
             <nav className="flex flex-col space-y-4 text-base tracking-wide">
+              <button
+                onClick={() => {
+                  setCurrentView('product');
+                  setMobileMenuOpen(false);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="text-left text-white font-medium py-2 border-b border-white/5 cursor-pointer"
+              >
+                Lunar Ring (₹799)
+              </button>
               <a
                 href="#collections"
-                onClick={() => setMobileMenuOpen(false)}
+                onClick={() => {
+                  setCurrentView('home');
+                  setMobileMenuOpen(false);
+                }}
                 className="text-[#C0C0C0] hover:text-white py-2 border-b border-white/5"
               >
                 Collections
               </a>
               <a
                 href="#shop"
-                onClick={() => setMobileMenuOpen(false)}
+                onClick={() => {
+                  setCurrentView('home');
+                  setMobileMenuOpen(false);
+                }}
                 className="text-[#C0C0C0] hover:text-white py-2 border-b border-white/5"
               >
                 Fine jewelry
               </a>
               <a
                 href="#categories"
-                onClick={() => setMobileMenuOpen(false)}
+                onClick={() => {
+                  setCurrentView('home');
+                  setMobileMenuOpen(false);
+                }}
                 className="text-[#C0C0C0] hover:text-white py-2 border-b border-white/5"
               >
                 Categories
               </a>
               <a
                 href="#maison"
-                onClick={() => setMobileMenuOpen(false)}
+                onClick={() => {
+                  setCurrentView('home');
+                  setMobileMenuOpen(false);
+                }}
                 className="text-[#C0C0C0] hover:text-white py-2 border-b border-white/5"
               >
                 The maison & craft
@@ -302,7 +364,22 @@ export default function App() {
         )}
       </header>
 
-      {/* 4. HERO SECTION */}
+      {/* VIEW SWITCHER: PRODUCT DETAILS OR HOME */}
+      {currentView === 'product' ? (
+        <ProductDetails
+          onBackToHome={() => {
+            setCurrentView('home');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          onAddToCart={addToCart}
+          onOpenCart={() => setCartOpen(true)}
+          onSelectRelatedProduct={() => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+        />
+      ) : (
+        <>
+          {/* 4. HERO SECTION */}
       <section className="relative min-h-[80vh] max-h-[850px] flex items-center justify-center overflow-hidden border-b border-white/10">
         {/* Background Editorial Image with Luxury Dark Overlays */}
         <div className="absolute inset-0 z-0">
@@ -317,13 +394,6 @@ export default function App() {
 
         {/* Hero Content */}
         <div className="relative z-10 max-w-5xl mx-auto px-6 text-center py-16 md:py-20">
-          <div className="inline-flex items-center gap-3 px-4 py-1.5 border border-white/20 bg-black/40 backdrop-blur-md mb-8">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#C0C0C0] animate-pulse" />
-            <span className="text-[11px] uppercase tracking-[0.35em] text-[#D0D0D0] font-light">
-              High Jewelry Edition • Autumn / Winter
-            </span>
-          </div>
-
           <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-aileron font-light tracking-[0.04em] leading-tight mb-6 chrome-gradient-text drop-shadow-[0_15px_30px_rgba(0,0,0,0.9)]">
             Wear the universe
           </h1>
@@ -333,17 +403,20 @@ export default function App() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-5">
+            <button
+              onClick={() => {
+                setCurrentView('product');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className="w-full sm:w-auto px-10 py-4 chrome-button text-xs uppercase tracking-[0.3em] font-semibold cursor-pointer shadow-lg"
+            >
+              Flagship: Lunar Ring (₹799)
+            </button>
             <a
               href="#collections"
-              className="w-full sm:w-auto px-10 py-4 chrome-button text-xs uppercase tracking-[0.3em] font-semibold text-center"
-            >
-              Explore Collection
-            </a>
-            <a
-              href="#shop"
               className="w-full sm:w-auto px-10 py-4 border border-[#C0C0C0]/50 hover:border-white hover:bg-white/5 transition-all text-xs uppercase tracking-[0.3em] text-[#E0E0E0] font-medium backdrop-blur-md text-center"
             >
-              New Arrivals
+              Explore Collection
             </a>
           </div>
 
@@ -614,10 +687,13 @@ export default function App() {
 
                 <div className="pt-4 border-t border-white/5 flex items-center justify-between">
                   <span className="font-mono text-sm tracking-wider text-white">
-                    ${product.price}.00
+                    ₹{product.price}
                   </span>
                   <button
-                    onClick={() => addToCart(product)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      addToCart(product);
+                    }}
                     className="md:hidden text-xs uppercase tracking-[0.2em] text-[#C0C0C0] hover:text-white"
                   >
                     + Bag
@@ -749,6 +825,8 @@ export default function App() {
           </form>
         )}
       </section>
+        </>
+      )}
 
       {/* 10. LUXURY FOOTER */}
       <footer className="bg-[#050505] border-t border-white/10 pt-16 pb-12 px-6">
@@ -925,15 +1003,15 @@ export default function App() {
                 <div className="py-4 border-b border-white/5">
                   <div className="flex justify-between text-[11px] uppercase tracking-wider text-[#A0A0A0] mb-2">
                     <span>
-                      {cartTotal >= 500
+                      {cartTotal >= 1500
                         ? "Complimentary Worldwide Express Courier Unlocked"
-                        : `Add $${500 - cartTotal} more for Complimentary Courier`}
+                        : `Add ₹${1500 - cartTotal} more for Complimentary Courier`}
                     </span>
                   </div>
                   <div className="w-full bg-[#222222] h-1">
                     <div
                       className="bg-[#C0C0C0] h-1 transition-all duration-500"
-                      style={{ width: `${Math.min(100, (cartTotal / 500) * 100)}%` }}
+                      style={{ width: `${Math.min(100, (cartTotal / 1500) * 100)}%` }}
                     />
                   </div>
                 </div>
@@ -960,7 +1038,7 @@ export default function App() {
                             {item.material}
                           </span>
                           <span className="font-mono text-xs text-[#D0D0D0] mt-1 block">
-                            ${item.price}.00
+                            ₹{item.price}
                           </span>
                         </div>
                         <div className="flex items-center border border-white/20">
@@ -990,7 +1068,7 @@ export default function App() {
               <div className="pt-6 border-t border-white/10">
                 <div className="flex justify-between text-xs uppercase tracking-widest text-[#888888] mb-2">
                   <span>Subtotal</span>
-                  <span className="font-mono text-white text-base">${cartTotal}.00</span>
+                  <span className="font-mono text-white text-base">₹{cartTotal}</span>
                 </div>
                 <p className="text-[10px] text-[#666666] uppercase tracking-wider mb-6">
                   Taxes, duties & insurance calculated at checkout.
