@@ -426,10 +426,11 @@ export default function App() {
               </h4>
               <ul className="space-y-3 text-xs text-[#808080]">
                 <li><Link to="/product/lunar-silver-ring" className="hover:text-white transition-colors">Lunar Silver Ring (₹799)</Link></li>
-                <li><Link to="/product/nova-orbital-hoops" className="hover:text-white transition-colors">Nova Orbital Hoops</Link></li>
-                <li><Link to="/product/eclipse-pave-pendant" className="hover:text-white transition-colors">Eclipse Pavé Pendant</Link></li>
-                <li><Link to="/product/stardust-band-ring" className="hover:text-white transition-colors">Stardust Band Ring</Link></li>
-                <li><Link to="/product/celestial-cascade-choker" className="hover:text-white transition-colors">Celestial Cascade Choker</Link></li>
+                <li><Link to="/product/nova-eclipse-ring" className="hover:text-white transition-colors">Nova Eclipse Ring (₹849)</Link></li>
+                <li><Link to="/product/celestial-pendant" className="hover:text-white transition-colors">Celestial Pendant (₹1299)</Link></li>
+                <li><Link to="/product/orbit-bracelet" className="hover:text-white transition-colors">Orbit Bracelet (₹999)</Link></li>
+                <li><Link to="/product/stellar-chain" className="hover:text-white transition-colors">Stellar Chain (₹1499)</Link></li>
+                <li><Link to="/product/cosmic-signature-pendant" className="hover:text-white transition-colors">Cosmic Signature Pendant</Link></li>
               </ul>
             </div>
 
@@ -848,7 +849,7 @@ function HomePageContent({
                 </p>
               </div>
               <Link
-                to="/product/nova-orbital-hoops"
+                to="/product/nova-eclipse-ring"
                 className="text-xs uppercase tracking-[0.25em] text-white flex items-center gap-2 group-hover:gap-4 transition-all"
               >
                 <span>Explore Nova (₹849)</span>
@@ -880,7 +881,7 @@ function HomePageContent({
                 </p>
               </div>
               <Link
-                to="/product/eclipse-pave-pendant"
+                to="/product/celestial-pendant"
                 className="text-xs uppercase tracking-[0.25em] text-white flex items-center gap-2 group-hover:gap-4 transition-all"
               >
                 <span>Explore Eclipse (₹1299)</span>
@@ -905,7 +906,7 @@ function HomePageContent({
 
           {/* Filter Tabs */}
           <div className="flex flex-wrap gap-2 mt-6 md:mt-0">
-            {["All", "Rings", "Earrings", "Necklaces"].map((cat) => (
+            {["All", "Rings", "Necklaces", "Bracelets"].map((cat) => (
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}

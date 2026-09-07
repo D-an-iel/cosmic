@@ -14,12 +14,22 @@ export default function ProductDetails({ onAddToCart }) {
   const images = useMemo(() => product.gallery || [], [product.gallery]);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
+  // Available variants for this specific product
+  const colors = product.colors || COLOR_VARIANTS;
+  const sizes = product.sizes || SIZE_VARIANTS;
+  const sizeType = product.sizeType || 'Size (US)';
+
   // Variant & Purchase State
-  const [selectedColor, setSelectedColor] = useState(COLOR_VARIANTS[1].name); // Default Chrome
-  const [selectedSize, setSelectedSize] = useState("8");
+  const [selectedColor, setSelectedColor] = useState(() => colors[1]?.name || colors[0]?.name || 'Chrome');
+  const [selectedSize, setSelectedSize] = useState(() => sizes[0] || '8');
   const [quantity, setQuantity] = useState(1);
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
   const [lightboxImage, setLightboxImage] = useState(null);
+
+  // Ensure scroll is at top on mount
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   // Accordion State
   const [openAccordions, setOpenAccordions] = useState({
@@ -111,7 +121,7 @@ export default function ProductDetails({ onAddToCart }) {
 
   // Construct item payload for cart/checkout
   const currentItemPayload = {
-    id: `${product.slug}-${selectedColor.toLowerCase()}-${selectedSize}`,
+    id: `${product.slug}-${selectedColor.toLowerCase().replace(/\s+/g, '-')}-${selectedSize.replace(/["\s]/g, '')}`,
     slug: product.slug,
     name: product.name,
     price: product.price,
@@ -197,7 +207,7 @@ export default function ProductDetails({ onAddToCart }) {
               onClick={() => setLightboxImage(images[activeImageIndex]?.src)}
             >
               <img
-                key={activeImageIndex}
+                key={`${product.slug}-${activeImageIndex}`}
                 src={images[activeImageIndex]?.src}
                 alt={images[activeImageIndex]?.alt || product.name}
                 className="w-full h-full object-cover transition-all duration-500 ease-out group-hover:scale-105 filter brightness-95"
@@ -244,7 +254,7 @@ export default function ProductDetails({ onAddToCart }) {
             {/* Header: Collection Tag & In-Stock */}
             <div className="flex items-center justify-between">
               <span className="text-[10px] uppercase tracking-[0.25em] text-[#888888]">
-                {product.collection || "Permanent Collection"}
+                {product.collection || "Permanent Collection"} • {product.type}
               </span>
               <div className="flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
@@ -293,7 +303,7 @@ export default function ProductDetails({ onAddToCart }) {
                 </span>
               </div>
               <div className="grid grid-cols-3 gap-2">
-                {COLOR_VARIANTS.map((col) => {
+                {colors.map((col) => {
                   const isSelected = selectedColor === col.name;
                   return (
                     <button
@@ -323,7 +333,7 @@ export default function ProductDetails({ onAddToCart }) {
             <div className="space-y-2 pt-1">
               <div className="flex justify-between text-xs">
                 <span className="uppercase text-[10px] tracking-[0.25em] text-[#808080]">
-                  Size (US): <span className="text-white font-medium">{selectedSize}</span>
+                  {sizeType}: <span className="text-white font-medium">{selectedSize}</span>
                 </span>
                 <button
                   type="button"
@@ -333,8 +343,8 @@ export default function ProductDetails({ onAddToCart }) {
                   Size Guide
                 </button>
               </div>
-              <div className="grid grid-cols-5 gap-2">
-                {SIZE_VARIANTS.map((size) => {
+              <div className={`grid gap-2 ${sizes.length <= 4 ? 'grid-cols-4' : 'grid-cols-5'}`}>
+                {sizes.map((size) => {
                   const isSelected = selectedSize === size;
                   return (
                     <button
@@ -508,7 +518,7 @@ export default function ProductDetails({ onAddToCart }) {
 
       {/* ========================================================================= */}
       {/* 3. CUSTOMER STORIES / REVIEWS (COMPACT HORIZONTAL RAIL)                   */}
-      {/* Width: 400–500px, Height: 220–280px, Wheel-to-horizontal scrolling       */}
+      {/* Width: 400–500px, Height: 220–280px, Wheel & Drag horizontally            */}
       {/* ========================================================================= */}
       <section id="customer-stories" className="border-t border-b border-white/10 bg-[#040404] py-14 px-4 sm:px-8 lg:px-12 overflow-hidden">
         <div className="max-w-[1400px] mx-auto mb-8 flex items-end justify-between gap-4">
@@ -602,7 +612,7 @@ export default function ProductDetails({ onAddToCart }) {
               {/* Bottom Line: Acquisition context */}
               <div className="pt-2.5 border-t border-white/10 flex items-center justify-between text-[10px] text-[#707070]">
                 <span>
-                  {product.name} / {rev.color || 'Chrome'} • Size {rev.size}
+                  {product.name} / {rev.color || 'Chrome'} • {sizeType}: {rev.size}
                 </span>
                 <span className="font-mono text-[#888888]">
                   {rev.location}
@@ -678,7 +688,7 @@ export default function ProductDetails({ onAddToCart }) {
       </section>
 
       {/* ========================================================================= */}
-      {/* 5. SIZE GUIDE MODAL                                                       */}
+      {/* 5. SIZE GUIDE MODAL (DYNAMIC FOR RINGS, NECKLACES, BRACELETS)            */}
       {/* ========================================================================= */}
       {sizeGuideOpen && (
         <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-4">
@@ -691,32 +701,74 @@ export default function ProductDetails({ onAddToCart }) {
               ✕
             </button>
             <span className="text-[10px] uppercase tracking-[0.25em] text-[#808080] block mb-1">
-              Atelier Sizing
+              Atelier Sizing Master
             </span>
             <h3 className="text-xl font-serif uppercase tracking-wider text-white mb-3 font-normal">
-              Ring Sizing Specifications
+              {product.type === 'Necklaces'
+                ? 'Chain Length Guide'
+                : product.type === 'Bracelets'
+                ? 'Wrist Sizing Specifications'
+                : 'Ring Sizing Specifications'}
             </h3>
             <p className="text-xs text-[#A0A0A0] mb-6 font-light leading-relaxed">
-              Cosmic rings are engineered with our curved inner shank ("Comfort Fit"). If between sizes, choose your standard US size.
+              {product.type === 'Necklaces'
+                ? 'Cosmic chains and pendants are measured end-to-end including the signature security lock.'
+                : product.type === 'Bracelets'
+                ? 'Engineered with memory-flex silver. Measure wrist circumference snugly at the wrist bone.'
+                : 'Cosmic rings are engineered with our curved inner shank ("Comfort Fit"). If between sizes, choose your standard US size.'}
             </p>
 
             <div className="overflow-x-auto mb-6">
-              <table className="w-full text-xs text-left border-collapse">
-                <thead>
-                  <tr className="border-b border-white/20 text-[#707070] uppercase tracking-wider text-[9px]">
-                    <th className="py-2 font-medium">US Size</th>
-                    <th className="py-2 font-medium">Inside Diam.</th>
-                    <th className="py-2 font-medium">Circumference</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-white/10 font-mono text-[#C0C0C0]">
-                  <tr><td className="py-2.5 text-white font-semibold">6</td><td>16.5 mm</td><td>51.9 mm</td></tr>
-                  <tr><td className="py-2.5 text-white font-semibold">7</td><td>17.3 mm</td><td>54.4 mm</td></tr>
-                  <tr><td className="py-2.5 text-white font-semibold">8</td><td>18.1 mm</td><td>57.0 mm</td></tr>
-                  <tr><td className="py-2.5 text-white font-semibold">9</td><td>18.9 mm</td><td>59.5 mm</td></tr>
-                  <tr><td className="py-2.5 text-white font-semibold">10</td><td>19.8 mm</td><td>62.1 mm</td></tr>
-                </tbody>
-              </table>
+              {product.type === 'Necklaces' ? (
+                <table className="w-full text-xs text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-white/20 text-[#707070] uppercase tracking-wider text-[9px]">
+                      <th className="py-2 font-medium">Length</th>
+                      <th className="py-2 font-medium">Metric</th>
+                      <th className="py-2 font-medium">Anatomical Placement</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/10 font-mono text-[#C0C0C0]">
+                    <tr><td className="py-2.5 text-white font-semibold">18"</td><td>45 cm</td><td>Base of the neck</td></tr>
+                    <tr><td className="py-2.5 text-white font-semibold">20"</td><td>50 cm</td><td>At collarbone (Standard)</td></tr>
+                    <tr><td className="py-2.5 text-white font-semibold">22"</td><td>55 cm</td><td>Top of sternum</td></tr>
+                    <tr><td className="py-2.5 text-white font-semibold">24"</td><td>60 cm</td><td>Mid-chest statement</td></tr>
+                  </tbody>
+                </table>
+              ) : product.type === 'Bracelets' ? (
+                <table className="w-full text-xs text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-white/20 text-[#707070] uppercase tracking-wider text-[9px]">
+                      <th className="py-2 font-medium">Size</th>
+                      <th className="py-2 font-medium">Wrist Circumf.</th>
+                      <th className="py-2 font-medium">Fit Profile</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/10 font-mono text-[#C0C0C0]">
+                    <tr><td className="py-2.5 text-white font-semibold">6.5"</td><td>15.5–16.5 cm</td><td>Petite / Snug</td></tr>
+                    <tr><td className="py-2.5 text-white font-semibold">7.0"</td><td>17.0–18.0 cm</td><td>Standard Classic</td></tr>
+                    <tr><td className="py-2.5 text-white font-semibold">7.5"</td><td>18.5–19.5 cm</td><td>Relaxed Drape</td></tr>
+                    <tr><td className="py-2.5 text-white font-semibold">8.0"</td><td>20.0–21.0 cm</td><td>Comfort / Broad</td></tr>
+                  </tbody>
+                </table>
+              ) : (
+                <table className="w-full text-xs text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-white/20 text-[#707070] uppercase tracking-wider text-[9px]">
+                      <th className="py-2 font-medium">US Size</th>
+                      <th className="py-2 font-medium">Inside Diam.</th>
+                      <th className="py-2 font-medium">Circumference</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/10 font-mono text-[#C0C0C0]">
+                    <tr><td className="py-2.5 text-white font-semibold">6</td><td>16.5 mm</td><td>51.9 mm</td></tr>
+                    <tr><td className="py-2.5 text-white font-semibold">7</td><td>17.3 mm</td><td>54.4 mm</td></tr>
+                    <tr><td className="py-2.5 text-white font-semibold">8</td><td>18.1 mm</td><td>57.0 mm</td></tr>
+                    <tr><td className="py-2.5 text-white font-semibold">9</td><td>18.9 mm</td><td>59.5 mm</td></tr>
+                    <tr><td className="py-2.5 text-white font-semibold">10</td><td>19.8 mm</td><td>62.1 mm</td></tr>
+                  </tbody>
+                </table>
+              )}
             </div>
 
             <button
