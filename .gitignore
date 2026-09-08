@@ -1,0 +1,10 @@
+node_modules/
+.env
+.DS_Store
+dist/
+build/
+.claude/
+.token_file
+app_temp.jsx
+test-payment.js
+devDependencies/
