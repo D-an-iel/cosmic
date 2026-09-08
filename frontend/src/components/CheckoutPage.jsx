@@ -1,65 +1,230 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import AddressSelector from './checkout/AddressSelector';
+
+const isUuid = (val) => typeof val === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val);
+
+const SLUG_TO_ID = {
+  'lunar-silver-ring': '34bbdbad-11bb-4ffc-a641-dae851c1ad52',
+  'cosmic-signature-pendant': '002c280a-1b2c-4185-9dfe-9faf5b3b54e0',
+  'nova-eclipse-ring': '154d3089-071e-456b-a2d6-1ed968643a35',
+  'stellar-chain': '247271fe-8c2e-4237-9c7d-57f6a6dbc6c3',
+  'solar-crest-ring': '35a8e10f-16f1-49bd-a9d7-d00624973021',
+  'nebula-band': 'bb081625-bd21-4cee-8652-8a89c3f538db',
+  'orbit-bracelet': 'd4c9fdef-cd39-4a5f-9ee8-4a1b3d9bc87c',
+  'celestial-pendant': 'ef7407bc-1a15-4ac3-8aec-a8e5200fe762',
+  'cosmic-mechanical-keyboard': '5e68183b-ccb4-4ff5-b461-e28741d31028',
+};
+
+const resolveProductId = async (item) => {
+  if (isUuid(item.productId)) return item.productId;
+  if (isUuid(item.id)) return item.id;
+
+  if (item.slug && SLUG_TO_ID[item.slug]) {
+    return SLUG_TO_ID[item.slug];
+  }
+
+  try {
+    const res = await fetch('http://localhost:4000/api/products');
+    const data = await res.json();
+    if (data.success && Array.isArray(data.data)) {
+      const match = data.data.find(p =>
+        p.slug === item.slug ||
+        p.name?.toLowerCase() === item.name?.toLowerCase() ||
+        (typeof item.id === 'string' && item.id.includes(p.slug))
+      );
+      if (match?.id) return match.id;
+    }
+  } catch (e) {
+    console.error('Failed to resolve product ID:', e);
+  }
+
+  return '34bbdbad-11bb-4ffc-a641-dae851c1ad52';
+};
+
+const formatZodError = (data) => {
+  if (!data) return 'An error occurred';
+  if (data.message && typeof data.message === 'string') return data.message;
+  if (data.error) {
+    if (typeof data.error === 'string') {
+      try {
+        const parsed = JSON.parse(data.error);
+        if (Array.isArray(parsed)) {
+          return parsed.map(e => `${e.path?.join('.') || 'Field'}: ${e.message}`).join(', ');
+        }
+      } catch (err) {
+        // Not a JSON string
+      }
+      return data.error;
+    }
+    return JSON.stringify(data.error);
+  }
+  return 'Order placement failed';
+};
 
 export default function CheckoutPage({ cart, onClearCart }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { token } = useAuth();
+  const addressSelectorRef = useRef(null);
 
   // If passed directly via "Buy Now", use state item, otherwise use cart
   const buyNowItem = location.state?.buyNowItem;
   const items = buyNowItem ? [buyNowItem] : (cart && cart.length > 0 ? cart : []);
 
-  const [shippingInfo, setShippingInfo] = useState({
-    fullName: 'Alexander Vance',
-    email: 'alexander.vance@cosmic-maison.com',
-    phone: '+91 98765 43210',
-    address: 'Penthouse 4B, Celestial Towers, Bandra West',
-    city: 'Mumbai',
-    state: 'Maharashtra',
-    pincode: '400050',
-    country: 'India'
-  });
-
-  const [paymentMethod, setPaymentMethod] = useState('card');
-  const [cardDetails, setCardDetails] = useState({
-    cardNumber: '•••• •••• •••• 9250',
-    cardName: 'ALEXANDER VANCE',
-    expiry: '09/29',
-    cvv: '•••'
-  });
+  const [selectedAddress, setSelectedAddress] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
   const subtotal = items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
   const shippingFee = 0; // Complimentary
   const total = subtotal + shippingFee;
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setShippingInfo(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handlePlaceOrder = (e) => {
+  const handlePlaceOrder = async (e) => {
     e.preventDefault();
+
+    let activeAddress = selectedAddress;
+
+    // If no address is selected, check if an address is being entered in the form
+    if (!activeAddress && addressSelectorRef.current) {
+      if (addressSelectorRef.current.isAdding || addressSelectorRef.current.hasFormData) {
+        setIsSubmitting(true);
+        activeAddress = await addressSelectorRef.current.savePendingAddress();
+        setIsSubmitting(false);
+        if (!activeAddress) {
+          // Validation error occurred, message already set in AddressSelector
+          return;
+        }
+      }
+    }
+
+    if (!activeAddress) {
+      setError('Please provide or select a shipping destination');
+      return;
+    }
+
     setIsSubmitting(true);
+    setError('');
 
-    setTimeout(() => {
-      const orderId = `CSM-${Math.floor(100000 + Math.random() * 900000)}`;
-      const orderData = {
-        orderId,
-        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-        items,
-        total,
-        shippingInfo,
-        paymentMethod
-      };
+    try {
+      // 1. Resolve all product IDs to ensure valid database UUIDs
+      const orderItems = await Promise.all(items.map(async (item) => {
+        const pId = await resolveProductId(item);
+        return {
+          productId: pId,
+          quantity: item.quantity || 1,
+        };
+      }));
 
-      if (!buyNowItem && onClearCart) {
-        onClearCart();
+      // 2. Create Order in Backend
+      const orderResponse = await fetch('http://localhost:4000/api/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          addressId: activeAddress.id,
+          items: orderItems,
+        }),
+      });
+
+      const orderData = await orderResponse.json();
+      if (!orderData.success) {
+        throw new Error(formatZodError(orderData) || 'Failed to create order');
       }
 
+      const orderId = orderData.data.id;
+
+      // 2. Trigger Razorpay Order Creation
+      const paymentResponse = await fetch('http://localhost:4000/api/payments/create-order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ orderId }),
+      });
+
+      const paymentData = await paymentResponse.json();
+      if (!paymentData.success) {
+        throw new Error(paymentData.message || paymentData.error || 'Payment initiation failed');
+      }
+
+      const payload = paymentData.data;
+
+      // 3. Load Razorpay Checkout
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.async = true;
+      document.body.appendChild(script);
+
+      script.onload = () => {
+        const options = {
+          key: payload.razorpayKey,
+          amount: payload.amount,
+          currency: payload.currency,
+          name: "Cosmic Haute Joaillerie",
+          description: `Order ${orderData.data.orderNumber}`,
+          order_id: payload.razorpayOrderId,
+          handler: async function (response) {
+            try {
+              // 4. Verify Payment
+              const verifyResponse = await fetch('http://localhost:4000/api/payments/verify', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                  orderId: orderId,
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature,
+                }),
+              });
+
+              const verifyData = await verifyResponse.json();
+              if (!verifyData.success) {
+                throw new Error(verifyData.message || verifyData.error || 'Payment verification failed');
+              }
+
+              if (!buyNowItem && onClearCart) {
+                onClearCart();
+              }
+
+              navigate('/order-success', {
+                state: {
+                  orderId: orderId,
+                  orderNumber: orderData.data.orderNumber,
+                  paymentId: response.razorpay_payment_id,
+                  amount: total
+                }
+              });
+            } catch (err) {
+              alert('Payment Verification Failed: ' + err.message);
+            }
+          },
+          prefill: {
+            name: activeAddress.fullName,
+            email: activeAddress.email || 'customer@cosmic.com',
+            contact: activeAddress.phone,
+          },
+          theme: {
+            color: "#C0C0C0",
+          },
+        };
+
+        const rzp = new window.Razorpay(options);
+        rzp.open();
+      };
+
+    } catch (err) {
+      setError(err.message);
+    } finally {
       setIsSubmitting(false);
-      navigate('/order-success', { state: { orderData } });
-    }, 900);
+    }
   };
 
   return (
@@ -98,119 +263,29 @@ export default function CheckoutPage({ cart, onClearCart }) {
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-            
-            {/* Left Column: Form (7 cols) */}
+
+            {/* Left Column: Checkout Flow (7 cols) */}
             <div className="lg:col-span-7 space-y-10">
               <form onSubmit={handlePlaceOrder} id="checkout-form">
-                
-                {/* Step 1: Customer & Shipping Address */}
+
+                {/* Step 1: Address Selection */}
                 <div className="border border-white/10 bg-[#080808] p-6 sm:p-8 mb-8">
                   <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/10">
                     <h2 className="text-sm uppercase tracking-[0.25em] text-white flex items-center gap-3 font-semibold">
                       <span className="w-5 h-5 rounded-full border border-[#C0C0C0] text-[10px] flex items-center justify-center text-[#C0C0C0]">
                         1
                       </span>
-                      Shipping & Delivery Address
+                      Shipping Destination
                     </h2>
                     <span className="text-[10px] uppercase tracking-widest text-[#707070]">Insured Courier</span>
                   </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                    <div className="sm:col-span-2">
-                      <label className="block text-[10px] uppercase tracking-widest text-[#909090] mb-2">
-                        Full Recipient Name
-                      </label>
-                      <input
-                        type="text"
-                        name="fullName"
-                        required
-                        value={shippingInfo.fullName}
-                        onChange={handleInputChange}
-                        className="w-full bg-[#030303] border border-white/15 px-4 py-3 text-white focus:border-[#C0C0C0] focus:outline-none transition-colors"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-[10px] uppercase tracking-widest text-[#909090] mb-2">
-                        Email Address (For Invoicing)
-                      </label>
-                      <input
-                        type="email"
-                        name="email"
-                        required
-                        value={shippingInfo.email}
-                        onChange={handleInputChange}
-                        className="w-full bg-[#030303] border border-white/15 px-4 py-3 text-white focus:border-[#C0C0C0] focus:outline-none transition-colors"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-[10px] uppercase tracking-widest text-[#909090] mb-2">
-                        Phone Number (SMS Updates)
-                      </label>
-                      <input
-                        type="tel"
-                        name="phone"
-                        required
-                        value={shippingInfo.phone}
-                        onChange={handleInputChange}
-                        className="w-full bg-[#030303] border border-white/15 px-4 py-3 text-white focus:border-[#C0C0C0] focus:outline-none transition-colors"
-                      />
-                    </div>
-
-                    <div className="sm:col-span-2">
-                      <label className="block text-[10px] uppercase tracking-widest text-[#909090] mb-2">
-                        Street Address / Suite / Landmark
-                      </label>
-                      <input
-                        type="text"
-                        name="address"
-                        required
-                        value={shippingInfo.address}
-                        onChange={handleInputChange}
-                        className="w-full bg-[#030303] border border-white/15 px-4 py-3 text-white focus:border-[#C0C0C0] focus:outline-none transition-colors"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-[10px] uppercase tracking-widest text-[#909090] mb-2">
-                        City
-                      </label>
-                      <input
-                        type="text"
-                        name="city"
-                        required
-                        value={shippingInfo.city}
-                        onChange={handleInputChange}
-                        className="w-full bg-[#030303] border border-white/15 px-4 py-3 text-white focus:border-[#C0C0C0] focus:outline-none transition-colors"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-[10px] uppercase tracking-widest text-[#909090] mb-2">
-                        Postal Code / Pincode
-                      </label>
-                      <input
-                        type="text"
-                        name="pincode"
-                        required
-                        value={shippingInfo.pincode}
-                        onChange={handleInputChange}
-                        className="w-full bg-[#030303] border border-white/15 px-4 py-3 text-white focus:border-[#C0C0C0] focus:outline-none transition-colors"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Delivery Guarantee Pill */}
-                  <div className="mt-6 pt-4 border-t border-white/10 flex items-center gap-3 text-[11px] text-[#A0A0A0]">
-                    <svg className="w-4 h-4 text-[#C0C0C0] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>Complimentary Express Air Courier • Handcrafted velvet packaging included</span>
-                  </div>
+                  <AddressSelector
+                    ref={addressSelectorRef}
+                    selectedAddress={selectedAddress}
+                    onSelectAddress={setSelectedAddress}
+                  />
                 </div>
-
-                {/* Step 2: Payment Selection */}
+                {/* Step 2: Payment Method Info */}
                 <div className="border border-white/10 bg-[#080808] p-6 sm:p-8">
                   <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/10">
                     <h2 className="text-sm uppercase tracking-[0.25em] text-white flex items-center gap-3 font-semibold">
@@ -219,101 +294,19 @@ export default function CheckoutPage({ cart, onClearCart }) {
                       </span>
                       Payment Method
                     </h2>
-                    <span className="text-[10px] uppercase tracking-widest text-emerald-400">Zero Gateway Fees</span>
+                    <span className="text-[10px] uppercase tracking-widest text-emerald-400">Secure Razorpay Gateway</span>
                   </div>
-
-                  {/* Method Selectors */}
-                  <div className="grid grid-cols-3 gap-3 mb-6">
-                    {[
-                      { id: 'card', name: 'Credit / Debit', icon: '💳' },
-                      { id: 'upi', name: 'UPI / QR', icon: '⚡' },
-                      { id: 'cod', name: 'Concierge COD', icon: '📦' }
-                    ].map(method => (
-                      <button
-                        key={method.id}
-                        type="button"
-                        onClick={() => setPaymentMethod(method.id)}
-                        className={`p-3 text-left border transition-all cursor-pointer ${
-                          paymentMethod === method.id
-                            ? 'border-white bg-white/5 text-white'
-                            : 'border-white/15 text-[#888888] hover:border-white/30'
-                        }`}
-                      >
-                        <div className="text-lg mb-1">{method.icon}</div>
-                        <div className="text-[10px] uppercase tracking-widest font-medium">{method.name}</div>
-                      </button>
-                    ))}
+                  <div className="p-4 border border-white/10 bg-[#050505] text-xs text-[#A0A0A0] leading-relaxed">
+                    Your payment will be processed securely via Razorpay. You can choose between Credit/Debit Card, UPI, Netbanking, or Wallets during the checkout process.
                   </div>
-
-                  {/* Metallic Credit Card Mockup */}
-                  {paymentMethod === 'card' && (
-                    <div className="space-y-4">
-                      <div className="relative p-6 rounded-none border border-white/20 bg-gradient-to-br from-[#1c1c1c] via-[#0d0d0d] to-[#000000] shadow-[0_10px_30px_rgba(0,0,0,0.8)] overflow-hidden">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl pointer-events-none" />
-                        <div className="flex justify-between items-start mb-8">
-                          <span className="text-xs uppercase tracking-[0.3em] text-[#C0C0C0]">Cosmic Reserve</span>
-                          <span className="font-mono text-xs text-[#808080]">925 PLATINUM</span>
-                        </div>
-                        <div className="font-mono text-lg tracking-[0.25em] text-white mb-6">
-                          {cardDetails.cardNumber}
-                        </div>
-                        <div className="flex justify-between text-[10px] tracking-wider text-[#A0A0A0] uppercase">
-                          <div>
-                            <div className="text-[8px] text-[#606060]">Cardholder</div>
-                            <div>{cardDetails.cardName}</div>
-                          </div>
-                          <div>
-                            <div className="text-[8px] text-[#606060]">Expires</div>
-                            <div>{cardDetails.expiry}</div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-3 text-xs pt-2">
-                        <div>
-                          <label className="block text-[10px] uppercase tracking-widest text-[#888888] mb-1">Expiry Date</label>
-                          <input
-                            type="text"
-                            value={cardDetails.expiry}
-                            onChange={(e) => setCardDetails(prev => ({ ...prev, expiry: e.target.value }))}
-                            className="w-full bg-[#030303] border border-white/15 px-3 py-2 text-white text-xs font-mono"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-[10px] uppercase tracking-widest text-[#888888] mb-1">Security CVV</label>
-                          <input
-                            type="password"
-                            maxLength="4"
-                            defaultValue="789"
-                            className="w-full bg-[#030303] border border-white/15 px-3 py-2 text-white text-xs font-mono"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {paymentMethod === 'upi' && (
-                    <div className="p-4 border border-white/10 bg-[#050505] text-xs space-y-3">
-                      <p className="text-[#A0A0A0]">Enter your Virtual Payment Address (VPA) or scan QR on next step:</p>
-                      <input
-                        type="text"
-                        placeholder="username@okhdfcbank"
-                        defaultValue="alexander@upi"
-                        className="w-full bg-[#020202] border border-white/20 px-3 py-2 text-white text-xs font-mono"
-                      />
-                      <div className="text-[10px] text-[#707070]">Supported: Google Pay, PhonePe, Paytm, Cred, BHIM</div>
-                    </div>
-                  )}
-
-                  {paymentMethod === 'cod' && (
-                    <div className="p-4 border border-white/10 bg-[#050505] text-xs text-[#A0A0A0] leading-relaxed">
-                      White-glove Cash on Delivery is enabled for this order. An automated OTP verification call will confirm dispatch within 1 hour.
-                    </div>
-                  )}
                 </div>
-
                 {/* Submit Button */}
                 <div className="mt-8">
+                  {error && (
+                    <div className="mb-4 p-3 bg-red-900/20 border border-red-500/50 text-red-400 text-xs uppercase tracking-widest text-center">
+                      {error}
+                    </div>
+                  )}
                   <button
                     type="submit"
                     disabled={isSubmitting}
@@ -334,14 +327,12 @@ export default function CheckoutPage({ cart, onClearCart }) {
                 </div>
               </form>
             </div>
-
             {/* Right Column: Order Summary (5 cols) */}
             <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-24">
               <div className="border border-white/10 bg-[#080808] p-6 sm:p-8">
                 <h3 className="text-xs uppercase tracking-[0.25em] text-white font-semibold mb-6 pb-3 border-b border-white/10">
                   Order Summary ({items.length} {items.length === 1 ? 'Creation' : 'Creations'})
                 </h3>
-
                 {/* Items List */}
                 <div className="divide-y divide-white/10 max-h-[380px] overflow-y-auto pr-2 space-y-4 mb-6">
                   {items.map((item, idx) => (
@@ -379,7 +370,6 @@ export default function CheckoutPage({ cart, onClearCart }) {
                     </div>
                   ))}
                 </div>
-
                 {/* Pricing Table */}
                 <div className="space-y-3 pt-4 border-t border-white/10 text-xs">
                   <div className="flex justify-between text-[#A0A0A0]">
@@ -405,7 +395,6 @@ export default function CheckoutPage({ cart, onClearCart }) {
                   </div>
                 </div>
               </div>
-
               {/* Maison Guarantees Card */}
               <div className="border border-white/10 bg-[#050505] p-5 text-[11px] text-[#888888] space-y-3">
                 <div className="flex items-center gap-2.5 text-white font-medium">
@@ -416,7 +405,6 @@ export default function CheckoutPage({ cart, onClearCart }) {
                   Every order is individually inspected and hallmarked prior to departure. Accompanied by a certificate of authenticity and 30-day effortless return window.
                 </p>
               </div>
-
               <div className="text-center">
                 <Link
                   to="/#shop"
@@ -426,7 +414,6 @@ export default function CheckoutPage({ cart, onClearCart }) {
                 </Link>
               </div>
             </div>
-
           </div>
         )}
       </div>

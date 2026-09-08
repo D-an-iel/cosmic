@@ -5,23 +5,12 @@ import cosmicEmblem from '../assets/cosmic_emblem.png';
 export default function OrderSuccessPage() {
   const location = useLocation();
   const orderData = location.state?.orderData || {
-    orderId: 'CSM-892410',
-    date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-    total: 799,
-    items: [
-      {
-        name: 'Lunar Silver Ring',
-        price: 799,
-        quantity: 1,
-        color: 'Chrome',
-        size: '8',
-      }
-    ],
+    orderNumber: 'CSM-000000',
+    paymentId: 'PAY-000000',
+    amount: 0,
+    items: [],
     shippingInfo: {
-      fullName: 'Alexander Vance',
-      city: 'Mumbai',
-      state: 'Maharashtra',
-      pincode: '400050'
+      fullName: 'Esteemed Patron',
     }
   };
 
@@ -62,15 +51,15 @@ export default function OrderSuccessPage() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-5 bg-[#030303] border border-white/10 text-left mb-10">
             <div>
               <span className="text-[9px] uppercase tracking-[0.25em] text-[#707070] block">Order Ref</span>
-              <span className="font-mono text-xs text-white font-medium">{orderData.orderId}</span>
+              <span className="font-mono text-xs text-white font-medium">{orderData.orderNumber}</span>
             </div>
             <div>
-              <span className="text-[9px] uppercase tracking-[0.25em] text-[#707070] block">Date</span>
-              <span className="text-xs text-white font-medium">{orderData.date}</span>
+              <span className="text-[9px] uppercase tracking-[0.25em] text-[#707070] block">Payment ID</span>
+              <span className="text-xs text-white font-medium">{orderData.paymentId}</span>
             </div>
             <div>
               <span className="text-[9px] uppercase tracking-[0.25em] text-[#707070] block">Total</span>
-              <span className="font-mono text-xs text-white font-medium">₹{orderData.total.toLocaleString('en-IN')}</span>
+              <span className="font-mono text-xs text-white font-medium">₹{orderData.amount?.toLocaleString('en-IN')}</span>
             </div>
             <div>
               <span className="text-[9px] uppercase tracking-[0.25em] text-[#707070] block">Delivery</span>

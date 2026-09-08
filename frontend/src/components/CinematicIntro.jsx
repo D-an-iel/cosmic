@@ -103,7 +103,7 @@ export default function CinematicIntro({ onComplete }) {
 
   return (
     <div
-      className={`fixed inset-0 z-50 bg-[#000000] flex flex-col items-center justify-center overflow-hidden transition-opacity duration-400 pointer-events-none select-none ${
+      className={`fixed inset-0 z-[110] bg-[#000000] flex flex-col items-center justify-center overflow-hidden transition-opacity duration-400 pointer-events-none select-none ${
         fadingOut ? 'opacity-0' : 'opacity-100'
       }`}
       aria-label="Cosmic Brand Cinematic Intro"

@@ -89,6 +89,16 @@ body {
   border-color: rgba(192, 192, 192, 0.25);
 }
 
+.chrome-border-refined {
+  border: 1px solid rgba(192, 192, 192, 0.15);
+  transition: border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.chrome-border-refined:hover {
+  border-color: rgba(192, 192, 192, 0.5);
+  box-shadow: 0 0 25px -5px rgba(192, 192, 192, 0.15);
+}
+
 .chrome-border-hover:hover {
   border-color: rgba(192, 192, 192, 0.65);
   box-shadow: 0 0 20px -3px rgba(192, 192, 192, 0.2);

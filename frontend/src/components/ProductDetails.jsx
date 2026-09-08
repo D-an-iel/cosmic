@@ -1,23 +1,70 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getProductBySlug, getRelatedProducts, COLOR_VARIANTS, SIZE_VARIANTS } from '../data/products';
+import { useAuth } from '../context/AuthContext';
+import OtpLoginModal from './modals/OtpLoginModal';
 
 export default function ProductDetails({ onAddToCart }) {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
-  // Retrieve current product based on URL slug (defaults to Lunar Silver Ring)
-  const product = getProductBySlug(slug);
-  const relatedProducts = getRelatedProducts(slug);
+  const [product, setProduct] = useState(null);
+  const [relatedProducts, setRelatedProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProductData = async () => {
+      try {
+        const response = await fetch(`http://localhost:4000/api/products/${slug}`);
+        const data = await response.json();
+        if (data.success) {
+          setProduct(data.data);
+          // In a real app, we'd have a separate endpoint for related products.
+          // For now, we can fetch all and filter, or if the API provides them, use those.
+          const allResp = await fetch('http://localhost:4000/api/products');
+          const allData = await allResp.json();
+          if (allData.success) {
+            const all = allData.data;
+            const currentProduct = all.find(p => p.slug === slug);
+
+            // Curation logic:
+            // 1. Same category (Exact match)
+            // 2. Category keyword match (e.g., "Ring" in "Architectural Ring Collection")
+            // 3. Rest of catalog
+            const sameCategory = all.filter(p => p.slug !== slug && p.category === currentProduct?.category);
+            const keywordMatch = all.filter(p => {
+              if (p.slug === slug || sameCategory.includes(p)) return false;
+              const cat = p.category?.toLowerCase() || "";
+              const currentCat = currentProduct?.category?.toLowerCase() || "";
+              // Extract primary keyword (e.g., "Ring" from "Architectural Ring Collection")
+              const keywords = ["ring", "necklace", "bracelet", "earring", "pendant"];
+              const matchedKeyword = keywords.find(k => currentCat.includes(k));
+              return matchedKeyword && cat.includes(matchedKeyword);
+            });
+            const others = all.filter(p => p.slug !== slug && !sameCategory.includes(p) && !keywordMatch.includes(p));
+
+            const related = [...sameCategory, ...keywordMatch, ...others].slice(0, 4);
+            setRelatedProducts(related);
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching product:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProductData();
+  }, [slug]);
 
   // Gallery Imagery
-  const images = useMemo(() => product.gallery || [], [product.gallery]);
+  const images = useMemo(() => product?.images || [], [product?.images]);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
   // Available variants for this specific product
-  const colors = product.colors || COLOR_VARIANTS;
-  const sizes = product.sizes || SIZE_VARIANTS;
-  const sizeType = product.sizeType || 'Size (US)';
+  const colors = product?.colors || COLOR_VARIANTS;
+  const sizes = product?.sizes || SIZE_VARIANTS;
+  const sizeType = product?.sizeType || 'Size (US)';
 
   // Variant & Purchase State
   const [selectedColor, setSelectedColor] = useState(() => colors[1]?.name || colors[0]?.name || 'Chrome');
@@ -25,6 +72,7 @@ export default function ProductDetails({ onAddToCart }) {
   const [quantity, setQuantity] = useState(1);
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
   const [lightboxImage, setLightboxImage] = useState(null);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   // Ensure scroll is at top on mount
   useEffect(() => {
@@ -121,15 +169,15 @@ export default function ProductDetails({ onAddToCart }) {
 
   // Construct item payload for cart/checkout
   const currentItemPayload = {
-    id: `${product.slug}-${selectedColor.toLowerCase().replace(/\s+/g, '-')}-${selectedSize.replace(/["\s]/g, '')}`,
-    slug: product.slug,
-    name: product.name,
-    price: product.price,
+    productId: product?.id,
+    slug: product?.slug,
+    name: product?.name,
+    price: product?.price,
     color: selectedColor,
     size: selectedSize,
     quantity: quantity,
-    material: product.shortDescription,
-    image: images[activeImageIndex]?.src || images[0]?.src || product.image
+    material: product?.shortDescription,
+    image: images[activeImageIndex]?.src || images[0]?.src || product?.image
   };
 
   const handleAddToCart = () => {
@@ -139,8 +187,35 @@ export default function ProductDetails({ onAddToCart }) {
   };
 
   const handleBuyNow = () => {
-    navigate('/checkout', { state: { buyNowItem: currentItemPayload } });
+    if (user && user.id) {
+      navigate('/checkout', { state: { buyNowItem: currentItemPayload } });
+    } else {
+      setIsLoginModalOpen(true);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="bg-[#000000] text-white min-h-screen flex items-center justify-center">
+        <div className="animate-pulse text-[10px] uppercase tracking-[0.5em] text-[#C0C0C0]">
+          Loading Atelier Selection...
+        </div>
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="bg-[#000000] text-white min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl font-serif uppercase tracking-wider mb-4">Creation Not Found</h2>
+          <Link to="/" className="text-xs uppercase tracking-widest text-[#C0C0C0] hover:text-white underline underline-offset-4">
+            Return to Maison
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-[#000000] text-white min-h-screen font-sans selection:bg-[#C0C0C0] selection:text-black">
@@ -806,6 +881,15 @@ export default function ProductDetails({ onAddToCart }) {
         </div>
       )}
 
+      <OtpLoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        onLoginSuccess={() => {
+          setIsLoginModalOpen(false);
+          navigate('/checkout', { state: { buyNowItem: currentItemPayload } });
+        }}
+        purchaseIntent={currentItemPayload}
+      />
     </div>
   );
 }
