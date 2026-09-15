@@ -64,11 +64,18 @@ export default function DeconstructedCampaignHero() {
   });
 
   useEffect(() => {
+    let timer = null;
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        setIsMobile(window.innerWidth < 768);
+      }, 100);
     };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener('resize', handleResize, { passive: true });
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
   const { scrollYProgress } = useScroll({
@@ -236,8 +243,8 @@ export default function DeconstructedCampaignHero() {
   );
 }
 
-// Sub-component: A single architectural slice of the master photograph
-function SplitImagePanel({ panel, progress, isMobile }) {
+// Sub-component: A single architectural slice of the master photograph (Memoized)
+const SplitImagePanel = React.memo(function SplitImagePanel({ panel, progress, isMobile }) {
   const targetX = isMobile ? panel.mobileDx : panel.dx;
   const targetY = isMobile ? panel.mobileDy : panel.dy;
 
@@ -254,6 +261,8 @@ function SplitImagePanel({ panel, progress, isMobile }) {
         x,
         y,
         clipPath: panel.clip,
+        transform: 'translate3d(0,0,0)',
+        willChange: 'transform',
       }}
       className="absolute inset-0 w-full h-full overflow-hidden"
     >
@@ -261,6 +270,8 @@ function SplitImagePanel({ panel, progress, isMobile }) {
       <img
         src={campaignMasterImg}
         alt="COSMIC Architectural Panel"
+        loading="eager"
+        decoding="async"
         className="w-full h-full object-cover object-center filter contrast-110 brightness-95 select-none"
       />
 
@@ -271,10 +282,10 @@ function SplitImagePanel({ panel, progress, isMobile }) {
       />
     </motion.div>
   );
-}
+});
 
-// Sub-component: Subtle glowing chrome pinpoint beacon
-function SubtleProductBeacon({ indicator, onClick }) {
+// Sub-component: Subtle glowing chrome pinpoint beacon (Memoized)
+const SubtleProductBeacon = React.memo(function SubtleProductBeacon({ indicator, onClick }) {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -307,4 +318,4 @@ function SubtleProductBeacon({ indicator, onClick }) {
       </div>
     </div>
   );
-}
+});
