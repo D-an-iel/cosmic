@@ -1,85 +1,62 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
 import campaignMasterImg from '../../assets/cosmic_campaign_master.jpg';
-import lunarImg from '../../assets/lunar_collection.jpg';
-import eclipseImg from '../../assets/eclipse_collection.jpg';
-import novaImg from '../../assets/nova_collection.jpg';
-import CampaignProductPanel from './CampaignProductPanel.jsx';
-import FloatingBuyNowDrawer from '../luxury-mobile/FloatingBuyNowDrawer.jsx';
-import { ArrowDown, Sparkles } from 'lucide-react';
+import { ArrowDown } from 'lucide-react';
 
-const CAMPAIGN_PIECES = [
+// 5 Architectural Panels
+const PANELS = [
+  { index: 0, clip: 'inset(0 80% 0 0)', dx: -24, dy: -8, mobileDx: -10, mobileDy: -4 },
+  { index: 1, clip: 'inset(0 60% 0 20%)', dx: -12, dy: 6, mobileDx: -5, mobileDy: 3 },
+  { index: 2, clip: 'inset(0 40% 0 40%)', dx: 0, dy: -4, mobileDx: 0, mobileDy: -2 },
+  { index: 3, clip: 'inset(0 20% 0 60%)', dx: 12, dy: 8, mobileDx: 5, mobileDy: 4 },
+  { index: 4, clip: 'inset(0 0 0 80%)', dx: 24, dy: -6, mobileDx: 10, mobileDy: -3 },
+];
+
+// Subtle Product Pinpoint Indicators (Subtle circles, thin chrome outlines, tiny glow, NO cards, NO prices)
+const PRODUCT_INDICATORS = [
   {
-    id: "34bbdbad-11bb-4ffc-a641-dae851c1ad52",
+    id: "ring",
     slug: "lunar-silver-ring",
-    name: "Lunar Silver Ring",
-    price: 799,
-    category: "Rings",
-    image: lunarImg,
-    origin: { x: -80, y: -60 }, // On left hand
-    destDesktop: { x: -320, y: -160, rotate: -4 },
-    destMobile: { x: -90, y: -210, rotate: -3 },
+    code: "01",
+    label: "Ring",
+    x: "41%",
+    y: "55%",
   },
   {
-    id: "celestial-pendant-001",
+    id: "pendant",
     slug: "celestial-pendant",
-    name: "Celestial Star Pendant",
-    price: 1299,
-    category: "Necklaces",
-    image: eclipseImg,
-    origin: { x: 0, y: 30 }, // On neck/chest
-    destDesktop: { x: 0, y: -200, rotate: 0 },
-    destMobile: { x: 85, y: -220, rotate: 2 },
+    code: "02",
+    label: "Pendant",
+    x: "50%",
+    y: "40%",
   },
   {
-    id: "stellar-chain-002",
+    id: "chain",
     slug: "stellar-chain",
-    name: "Stellar Curb Chain",
-    price: 1499,
-    category: "Necklaces",
-    image: novaImg,
-    origin: { x: -20, y: 0 }, // Collarbone drape
-    destDesktop: { x: -330, y: 150, rotate: 3 },
-    destMobile: { x: -95, y: -10, rotate: 2 },
+    code: "03",
+    label: "Chain",
+    x: "47%",
+    y: "32%",
   },
   {
-    id: "orbit-bracelet-003",
+    id: "bangle",
     slug: "orbit-bracelet",
-    name: "Orbit Liquid Bangle",
-    price: 999,
-    category: "Bracelets",
-    image: lunarImg,
-    origin: { x: 80, y: 120 }, // Lower right wrist
-    destDesktop: { x: 330, y: 140, rotate: -3 },
-    destMobile: { x: 90, y: 0, rotate: -3 },
+    code: "04",
+    label: "Bangle",
+    x: "63%",
+    y: "64%",
   },
   {
-    id: "nova-eclipse-ring-004",
+    id: "earring",
     slug: "nova-eclipse-ring",
-    name: "Nova Geometric Studs",
-    price: 649,
-    category: "Earrings",
-    image: novaImg,
-    origin: { x: 85, y: -110 }, // Ear lobe
-    destDesktop: { x: 320, y: -170, rotate: 4 },
-    destMobile: { x: -85, y: 195, rotate: -2 },
-  },
-  {
-    id: "cosmic-signature-pendant-005",
-    slug: "cosmic-signature-pendant",
-    name: "Cosmic Signature Piece",
-    price: 1599,
-    category: "Haute Joaillerie",
-    image: eclipseImg,
-    origin: { x: 0, y: 80 }, // Center focal
-    destDesktop: { x: 0, y: 220, rotate: 0 },
-    destMobile: { x: 85, y: 190, rotate: 3 },
+    code: "05",
+    label: "Earring",
+    x: "58%",
+    y: "24%",
   },
 ];
 
-export default function DeconstructedCampaignHero({ onQuickBuyProduct }) {
-  const navigate = useNavigate();
+export default function DeconstructedCampaignHero() {
   const containerRef = useRef(null);
 
   const [isMobile, setIsMobile] = useState(() => {
@@ -99,193 +76,234 @@ export default function DeconstructedCampaignHero({ onQuickBuyProduct }) {
     offset: ["start start", "end end"],
   });
 
-  // 1. Background Master Photograph Transforms
-  const imageScale = useTransform(scrollYProgress, [0, 0.15, 0.65], [1.0, 1.03, 1.1]);
-  const imageOpacity = useTransform(scrollYProgress, [0, 0.2, 0.6], [1.0, 0.85, 0.22]);
-  const imageBlur = useTransform(
+  // 1. Image Split Progress: 0 at start, 1 at peak split
+  const splitProgress = useTransform(scrollYProgress, [0.15, 0.65], [0, 1]);
+
+  // 2. Initial Brand Header Fade Out
+  const brandOpacity = useTransform(scrollYProgress, [0, 0.2], [1.0, 0.0]);
+
+  // 3. Deconstruction Metadata Fade In
+  const deconstructMetaOpacity = useTransform(
     scrollYProgress,
-    [0, 0.2, 0.6],
-    ["blur(0px)", "blur(3px)", "blur(14px)"]
+    [0.25, 0.4, 0.85, 0.95],
+    [0.0, 1.0, 1.0, 0.0]
   );
 
-  // 2. Typography Cross-Fades
-  const heroTextOpacity = useTransform(scrollYProgress, [0, 0.15, 0.25], [1.0, 0.7, 0.0]);
-  const deconstructedTitleOpacity = useTransform(
+  // 4. Subtle Product Indicators Fade In
+  const indicatorsOpacity = useTransform(
     scrollYProgress,
-    [0.22, 0.38, 0.85, 0.95],
-    [0.0, 1.0, 1.0, 0.4]
+    [0.32, 0.5, 0.88, 0.98],
+    [0.0, 1.0, 1.0, 0.2]
   );
+
+  // 5. Scroll Prompt Fade Out
   const scrollPromptOpacity = useTransform(scrollYProgress, [0, 0.12], [1.0, 0.0]);
 
-  // 3. Panel Deconstruction Progress (0 at start, 1 when fully separated)
-  const deconstructProgress = useTransform(scrollYProgress, [0.15, 0.62], [0, 1]);
-  const panelOpacity = useTransform(scrollYProgress, [0.12, 0.25, 0.65], [0.0, 0.7, 1.0]);
-
-  // Quick Buy Drawer State
-  const [drawerProduct, setDrawerProduct] = useState(null);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-
-  const handleInspect = (product) => {
-    navigate(`/cinematic/product/${product.slug}`);
+  const scrollToCollection = () => {
+    const el = document.getElementById('campaign-collection');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
-  const handleQuickBuy = (product) => {
-    setDrawerProduct(product);
-    setIsDrawerOpen(true);
+  const scrollToProduct = (slug) => {
+    const el = document.getElementById(`product-${slug}`);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      scrollToCollection();
+    }
   };
 
   return (
-    <div ref={containerRef} className="relative w-full h-[360vh] bg-black">
-      {/* PINNED STICKY VIEWPORT CONTAINER */}
-      <div className="sticky top-0 h-screen w-full overflow-hidden bg-black flex items-center justify-center select-none">
+    <div ref={containerRef} className="relative w-full h-[280vh] bg-black">
+      {/* PINNED HERO VIEWPORT */}
+      <div className="sticky top-0 h-screen w-full overflow-hidden bg-black flex flex-col items-center justify-center select-none px-4 sm:px-8">
         
-        {/* 1. MASTER HIGH-FASHION CAMPAIGN PHOTOGRAPH */}
+        {/* Subtle Background Radial Vignette */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#111111] via-[#060606] to-black pointer-events-none" />
+
+        {/* 1. INITIAL TOP BRANDING OVERLAY (Scroll 0 -> 0.18) */}
         <motion.div
-          style={{
-            scale: imageScale,
-            opacity: imageOpacity,
-            filter: imageBlur,
-          }}
-          className="absolute inset-0 z-0 w-full h-full"
-        >
-          <img
-            src={campaignMasterImg}
-            alt="COSMIC Fashion Campaign"
-            className="w-full h-full object-cover object-center filter contrast-110 brightness-95"
-          />
-          {/* Chiaroscuro Atmospheric Vignette */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-black/60 pointer-events-none" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-black/10 to-black/80 pointer-events-none" />
-        </motion.div>
-
-        {/* 2. INITIAL CAMPAIGN HERO BRANDING (Scroll 0 -> 0.2) */}
-        <motion.div
-          style={{ opacity: heroTextOpacity }}
-          className="absolute inset-0 z-10 flex flex-col justify-between items-center p-6 sm:p-12 text-center pointer-events-none"
-        >
-          {/* Top Campaign Eyebrow */}
-          <div className="pt-16 sm:pt-20">
-            <span className="text-[10px] uppercase tracking-[0.5em] text-[#C0C0C0] font-mono block drop-shadow-md">
-              HAUTE JOAILLERIE • CAMPAIGN MMXXVI
-            </span>
-          </div>
-
-          {/* Center Space for Model Adornment */}
-          <div className="flex-1" />
-
-          {/* Bottom Title & Scroll Invitation */}
-          <div className="space-y-4 pb-8 max-w-lg">
-            <h1 className="font-serif text-4xl sm:text-6xl uppercase tracking-[0.3em] text-white font-light drop-shadow-2xl">
-              COSMIC
-            </h1>
-            <p className="text-[11px] uppercase tracking-[0.4em] text-[#A0A0A0] font-light">
-              FORGED IN INTENTION
-            </p>
-            <motion.div
-              style={{ opacity: scrollPromptOpacity }}
-              className="pt-4 flex flex-col items-center gap-2 text-[10px] font-mono uppercase tracking-[0.3em] text-[#707070]"
-            >
-              <span>Scroll to deconstruct composition</span>
-              <motion.div
-                animate={{ y: [0, 6, 0] }}
-                transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-              >
-                <ArrowDown className="w-3.5 h-3.5 text-[#A0A0A0]" />
-              </motion.div>
-            </motion.div>
-          </div>
-        </motion.div>
-
-        {/* 3. DECONSTRUCTION TITLE (Appears as panels separate) */}
-        <motion.div
-          style={{ opacity: deconstructedTitleOpacity }}
-          className="absolute top-16 sm:top-20 left-0 right-0 z-10 text-center px-4 pointer-events-none"
+          style={{ opacity: brandOpacity }}
+          className="absolute top-12 sm:top-14 left-0 right-0 z-20 text-center pointer-events-none px-4"
         >
           <span className="text-[9px] uppercase tracking-[0.45em] text-[#A0A0A0] font-mono block">
-            DECONSTRUCTION // MMXXVI
+            MILAN • PARIS • NEW YORK
           </span>
-          <h2 className="font-serif text-xl sm:text-3xl uppercase tracking-[0.2em] text-white font-light mt-1">
-            Pieces Within The Silhouette
-          </h2>
-          <p className="text-[10px] uppercase tracking-[0.25em] text-[#606060] mt-1 font-mono">
-            Extracted from the composition • Tap to inspect or purchase
+          <h1 className="font-serif text-3xl sm:text-5xl uppercase tracking-[0.25em] text-white font-light mt-1">
+            COSMIC
+          </h1>
+          <p className="text-[10px] uppercase tracking-[0.35em] text-[#707070] mt-1 font-light">
+            HAUTE JOAILLERIE // CAMPAIGN MMXXVI
           </p>
         </motion.div>
 
-        {/* 4. THE 6 FLOATING DECONSTRUCTED PRODUCT PANELS */}
-        <div className="relative z-20 w-full h-full max-w-6xl mx-auto flex items-center justify-center pointer-events-none">
-          {CAMPAIGN_PIECES.map((piece, idx) => {
-            const dest = isMobile ? piece.destMobile : piece.destDesktop;
+        {/* 2. DECONSTRUCTION METADATA TITLE (Appears as panels divide) */}
+        <motion.div
+          style={{ opacity: deconstructMetaOpacity }}
+          className="absolute top-12 sm:top-14 left-0 right-0 z-20 text-center pointer-events-none px-4"
+        >
+          <span className="text-[9px] uppercase tracking-[0.4em] text-[#A0A0A0] font-mono block">
+            EDITORIAL DECONSTRUCTION
+          </span>
+          <h2 className="font-serif text-xl sm:text-2xl uppercase tracking-[0.2em] text-white font-light mt-0.5">
+            5 Architectural Panels
+          </h2>
+          <p className="text-[10px] uppercase tracking-[0.25em] text-[#707070] font-mono mt-0.5">
+            Indicators reveal pieces featured within the silhouette
+          </p>
+        </motion.div>
 
-            // Interpolate position from origin to destination as scroll advances
-            return (
-              <DeconstructedPiecePanel
-                key={piece.id}
-                index={idx + 1}
-                piece={piece}
-                origin={piece.origin}
-                destination={dest}
-                progress={deconstructProgress}
-                opacity={panelOpacity}
-                onInspect={handleInspect}
-                onQuickBuy={handleQuickBuy}
-                isMobile={isMobile}
+        {/* 3. CENTRAL CAMPAIGN IMAGE FRAME (90% Visual Priority) */}
+        <div className="relative w-full max-w-4xl lg:max-w-5xl h-[72vh] sm:h-[78vh] flex items-center justify-center my-auto">
+          
+          {/* Base Unified Master Image (Prevents any visual gaps) */}
+          <div className="absolute inset-0 rounded-lg overflow-hidden opacity-20 pointer-events-none">
+            <img
+              src={campaignMasterImg}
+              alt="COSMIC Master Silhouette"
+              className="w-full h-full object-cover object-center filter contrast-105 brightness-90"
+            />
+          </div>
+
+          {/* 5 ARCHITECTURAL SPLIT PANELS */}
+          <div className="relative w-full h-full">
+            {PANELS.map((panel) => {
+              return (
+                <SplitImagePanel
+                  key={panel.index}
+                  panel={panel}
+                  progress={splitProgress}
+                  isMobile={isMobile}
+                />
+              );
+            })}
+          </div>
+
+          {/* 4. SUBTLE PRODUCT PINPOINT INDICATORS (NO cards, NO prices, NO buy buttons) */}
+          <motion.div
+            style={{ opacity: indicatorsOpacity }}
+            className="absolute inset-0 pointer-events-auto"
+          >
+            {PRODUCT_INDICATORS.map((indicator) => (
+              <SubtleProductBeacon
+                key={indicator.id}
+                indicator={indicator}
+                onClick={() => scrollToProduct(indicator.slug)}
               />
-            );
-          })}
-        </div>
-      </div>
+            ))}
+          </motion.div>
 
-      {/* IN-PLACE 75vh FLOATING BUY NOW DRAWER */}
-      <FloatingBuyNowDrawer
-        isOpen={isDrawerOpen}
-        onClose={() => setIsDrawerOpen(false)}
-        product={drawerProduct}
-      />
+          {/* Atmospheric Frame Vignette */}
+          <div className="absolute inset-0 rounded-lg pointer-events-none shadow-[inset_0_0_50px_rgba(0,0,0,0.6)]" />
+        </div>
+
+        {/* 5. INITIAL SCROLL INVITATION PROMPT */}
+        <motion.div
+          style={{ opacity: scrollPromptOpacity }}
+          className="absolute bottom-8 left-0 right-0 z-20 flex flex-col items-center gap-2 pointer-events-none"
+        >
+          <span className="text-[9px] uppercase tracking-[0.3em] text-[#707070] font-mono">
+            Scroll to reveal structure
+          </span>
+          <motion.div
+            animate={{ y: [0, 5, 0] }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+          >
+            <ArrowDown className="w-3.5 h-3.5 text-[#A0A0A0]" />
+          </motion.div>
+        </motion.div>
+
+        {/* 6. TRANSITION INVITATION TO COLLECTION SECTION */}
+        <motion.div
+          style={{ opacity: deconstructMetaOpacity }}
+          className="absolute bottom-8 left-0 right-0 z-20 flex flex-col items-center gap-1.5 pointer-events-auto"
+        >
+          <button
+            type="button"
+            onClick={scrollToCollection}
+            className="group flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/15 hover:border-white/30 text-[9px] uppercase tracking-[0.25em] text-[#B0B0B0] hover:text-white transition-all cursor-pointer font-mono"
+          >
+            <span>Explore Featured Collection</span>
+            <ArrowDown className="w-3 h-3 group-hover:translate-y-0.5 transition-transform text-white" />
+          </button>
+        </motion.div>
+
+      </div>
     </div>
   );
 }
 
-// Sub-component computing smooth scroll physics for each floating panel
-function DeconstructedPiecePanel({
-  index,
-  piece,
-  origin,
-  destination,
-  progress,
-  opacity,
-  onInspect,
-  onQuickBuy,
-  isMobile,
-}) {
-  const x = useTransform(progress, [0, 1], [origin.x, destination.x]);
-  const y = useTransform(progress, [0, 1], [origin.y, destination.y]);
-  const rotate = useTransform(progress, [0, 1], [0, destination.rotate || 0]);
-  const scale = useTransform(
-    progress,
-    [0, 0.4, 1],
-    [0.75, 0.95, isMobile ? 0.92 : 1.0]
-  );
+// Sub-component: A single architectural slice of the master photograph
+function SplitImagePanel({ panel, progress, isMobile }) {
+  const targetX = isMobile ? panel.mobileDx : panel.dx;
+  const targetY = isMobile ? panel.mobileDy : panel.dy;
+
+  // Smooth transforms from together (0, 0) to slight separation
+  const x = useTransform(progress, [0, 1], [0, targetX]);
+  const y = useTransform(progress, [0, 1], [0, targetY]);
+
+  // Subtle hairline panel border fades in as panels separate
+  const borderOpacity = useTransform(progress, [0.1, 0.4], [0, 0.4]);
 
   return (
     <motion.div
       style={{
         x,
         y,
-        rotate,
-        scale,
-        opacity,
+        clipPath: panel.clip,
       }}
-      className={`absolute pointer-events-auto ${
-        isMobile ? 'w-[155px]' : 'w-[240px]'
-      }`}
+      className="absolute inset-0 w-full h-full overflow-hidden"
     >
-      <CampaignProductPanel
-        panelIndex={index}
-        product={piece}
-        onInspect={onInspect}
-        onQuickBuy={onQuickBuy}
+      {/* The Master Image slice */}
+      <img
+        src={campaignMasterImg}
+        alt="COSMIC Architectural Panel"
+        className="w-full h-full object-cover object-center filter contrast-110 brightness-95 select-none"
+      />
+
+      {/* Subtle Hairline Chrome Panel Border */}
+      <motion.div
+        style={{ opacity: borderOpacity }}
+        className="absolute inset-0 border-r border-l border-white/20 pointer-events-none"
       />
     </motion.div>
+  );
+}
+
+// Sub-component: Subtle glowing chrome pinpoint beacon
+function SubtleProductBeacon({ indicator, onClick }) {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <div
+      style={{ left: indicator.x, top: indicator.y }}
+      className="absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer z-30 group"
+      onClick={onClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      title={`Piece ${indicator.code}: ${indicator.label} (Click to view in collection)`}
+    >
+      {/* Outer Subtle Pulse Ring */}
+      <div className="relative flex items-center justify-center">
+        <span className="absolute w-6 h-6 rounded-full border border-white/30 animate-ping opacity-50 pointer-events-none" />
+        
+        {/* Core Chrome Ring */}
+        <div className="w-5 h-5 rounded-full bg-black/60 border border-white/80 flex items-center justify-center shadow-[0_0_12px_rgba(255,255,255,0.4)] group-hover:scale-125 group-hover:border-white transition-transform duration-300">
+          {/* Inner Pin Dot */}
+          <span className="w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_6px_#ffffff]" />
+        </div>
+
+        {/* Minimalist Micro Code Badge (Appears subtly on hover / touch) */}
+        <div
+          className={`absolute left-7 top-1/2 -translate-y-1/2 px-2 py-0.5 rounded bg-black/80 border border-white/20 text-[8px] font-mono uppercase tracking-widest text-[#E0E0E0] whitespace-nowrap transition-all duration-300 pointer-events-none ${
+            isHovered ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-1'
+          }`}
+        >
+          <span>{indicator.code} // {indicator.label}</span>
+        </div>
+      </div>
+    </div>
   );
 }

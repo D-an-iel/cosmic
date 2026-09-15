@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import SmoothScrollProvider from '../experimental/SmoothScrollProvider.jsx';
 import DeconstructedCampaignHero from './DeconstructedCampaignHero.jsx';
+import CampaignCollectionGrid from './CampaignCollectionGrid.jsx';
 import { useWishlist } from '../../context/WishlistContext.jsx';
 import { ArrowLeft, Heart, Sparkles, Orbit, Layers } from 'lucide-react';
 
@@ -21,7 +22,7 @@ export default function CampaignExperiencePage() {
         <div className="fixed top-0 left-0 right-0 z-50 bg-[#080808]/95 backdrop-blur-2xl border-b border-white/10 px-4 py-2 flex items-center justify-between text-[10px] uppercase tracking-[0.2em] text-[#A0A0A0] font-mono">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-white font-semibold">EXPERIMENTAL // DECONSTRUCTED CAMPAIGN</span>
+            <span className="text-white font-semibold">EXPERIMENTAL // AAKAR HOUSE SPLIT HERO</span>
           </div>
 
           <div className="flex items-center gap-4">
@@ -67,8 +68,11 @@ export default function CampaignExperiencePage() {
           </Link>
         </div>
 
-        {/* 4. PINNED DECONSTRUCTED CAMPAIGN HERO (350vh scroll track) */}
+        {/* 4. PINNED SPLIT-IMAGE CAMPAIGN HERO (100% Storytelling, 5 Architectural Panels, Subtle Beacons) */}
         <DeconstructedCampaignHero />
+
+        {/* 5. DOWNSTREAM FEATURED COLLECTION (100% Commerce: Cards, Pricing, Wishlist, Instant Buy) */}
+        <CampaignCollectionGrid />
 
         {/* 5. DOWNSTREAM ATELIER CRAFTSMANSHIP MANIFESTO */}
         <section className="py-28 px-6 bg-[#040404] border-t border-white/10 text-center space-y-8 relative z-20">
