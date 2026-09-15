@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import SmoothScrollProvider from '../experimental/SmoothScrollProvider.jsx';
 import DeconstructedCampaignHero from './DeconstructedCampaignHero.jsx';
-import CampaignCollectionGrid from './CampaignCollectionGrid.jsx';
+import EditorialHorizontalGallery from './EditorialHorizontalGallery.jsx';
 import { useWishlist } from '../../context/WishlistContext.jsx';
 import { ArrowLeft, Heart, Sparkles, Orbit, Layers } from 'lucide-react';
 
@@ -71,8 +71,8 @@ export default function CampaignExperiencePage() {
         {/* 4. PINNED SPLIT-IMAGE CAMPAIGN HERO (100% Storytelling, 5 Architectural Panels, Subtle Beacons) */}
         <DeconstructedCampaignHero />
 
-        {/* 5. DOWNSTREAM FEATURED COLLECTION (100% Commerce: Cards, Pricing, Wishlist, Instant Buy) */}
-        <CampaignCollectionGrid />
+        {/* 5. DOWNSTREAM EDITORIAL HORIZONTAL GALLERY (Dark Card Carousel) */}
+        <EditorialHorizontalGallery />
 
         {/* 5. DOWNSTREAM ATELIER CRAFTSMANSHIP MANIFESTO */}
         <section className="py-28 px-6 bg-[#040404] border-t border-white/10 text-center space-y-8 relative z-20">

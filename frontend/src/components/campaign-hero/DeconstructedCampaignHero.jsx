@@ -99,20 +99,18 @@ export default function DeconstructedCampaignHero() {
   // 5. Scroll Prompt Fade Out
   const scrollPromptOpacity = useTransform(scrollYProgress, [0, 0.12], [1.0, 0.0]);
 
+  // 6. Cinematic Hero Exit Dissolve: panels fade away into dark obsidian
+  const heroExitOpacity = useTransform(scrollYProgress, [0.82, 0.98], [1.0, 0.0]);
+
   const scrollToCollection = () => {
-    const el = document.getElementById('campaign-collection');
+    const el = document.getElementById('featured-collection');
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
-  const scrollToProduct = (slug) => {
-    const el = document.getElementById(`product-${slug}`);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    } else {
-      scrollToCollection();
-    }
+  const scrollToProduct = () => {
+    scrollToCollection();
   };
 
   return (
@@ -155,8 +153,11 @@ export default function DeconstructedCampaignHero() {
           </p>
         </motion.div>
 
-        {/* 3. CENTRAL CAMPAIGN IMAGE FRAME (90% Visual Priority) */}
-        <div className="relative w-full max-w-4xl lg:max-w-5xl h-[72vh] sm:h-[78vh] flex items-center justify-center my-auto">
+        {/* 3. CENTRAL CAMPAIGN IMAGE FRAME (Fades out into dark transition at hero exit) */}
+        <motion.div
+          style={{ opacity: heroExitOpacity }}
+          className="relative w-full max-w-4xl lg:max-w-5xl h-[72vh] sm:h-[78vh] flex items-center justify-center my-auto"
+        >
           
           {/* Base Unified Master Image (Prevents any visual gaps) */}
           <div className="absolute inset-0 rounded-lg overflow-hidden opacity-20 pointer-events-none">
@@ -190,14 +191,14 @@ export default function DeconstructedCampaignHero() {
               <SubtleProductBeacon
                 key={indicator.id}
                 indicator={indicator}
-                onClick={() => scrollToProduct(indicator.slug)}
+                onClick={scrollToProduct}
               />
             ))}
           </motion.div>
 
           {/* Atmospheric Frame Vignette */}
           <div className="absolute inset-0 rounded-lg pointer-events-none shadow-[inset_0_0_50px_rgba(0,0,0,0.6)]" />
-        </div>
+        </motion.div>
 
         {/* 5. INITIAL SCROLL INVITATION PROMPT */}
         <motion.div
@@ -225,7 +226,7 @@ export default function DeconstructedCampaignHero() {
             onClick={scrollToCollection}
             className="group flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/15 hover:border-white/30 text-[9px] uppercase tracking-[0.25em] text-[#B0B0B0] hover:text-white transition-all cursor-pointer font-mono"
           >
-            <span>Explore Featured Collection</span>
+            <span>Explore Editorial Showcase</span>
             <ArrowDown className="w-3 h-3 group-hover:translate-y-0.5 transition-transform text-white" />
           </button>
         </motion.div>
