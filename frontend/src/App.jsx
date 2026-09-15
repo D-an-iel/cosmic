@@ -22,6 +22,7 @@ import { useWishlist } from './context/WishlistContext.jsx';
 import LuxuryWishlistVault from './components/luxury-mobile/LuxuryWishlistVault.jsx';
 import ExperimentalExperience from './components/experimental/ExperimentalExperience.jsx';
 import CinematicProductPage from './components/luxury-mobile/CinematicProductPage.jsx';
+import CampaignExperiencePage from './components/campaign-hero/CampaignExperiencePage.jsx';
 import CurvedRecommendationCarousel from './components/luxury-mobile/CurvedRecommendationCarousel.jsx';
 import AdminGuard from './components/admin/AdminGuard.jsx';
 import AdminLayout from './components/admin/AdminLayout.jsx';
@@ -462,14 +463,22 @@ export default function App() {
                 )}
               </div>
 
-              {/* Experimental Preview Switcher */}
+              {/* Experimental Campaign & 3D Switchers */}
+              <Link
+                to="/campaign"
+                className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-[10px] uppercase tracking-[0.15em] text-amber-200 hover:text-white transition-all cursor-pointer"
+                title="View Aakar House-inspired deconstructed campaign hero"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                <span>✦ Campaign Hero</span>
+              </Link>
               <Link
                 to="/cinematic"
                 className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-[10px] uppercase tracking-[0.15em] text-[#C0C0C0] hover:text-white transition-all cursor-pointer"
-                title="View experimental mobile-first cinematic experience"
+                title="View experimental mobile-first cinematic 3D experience"
               >
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span>Cinematic Preview</span>
+                <span>3D Orbit</span>
               </Link>
 
               {/* Private Vault / Wishlist */}
@@ -689,6 +698,35 @@ export default function App() {
                 >
                   The Maison & Craft
                 </Link>
+
+                {/* Experimental Prototypes Access on Mobile */}
+                <div className="pt-2 pb-1 flex flex-col gap-1.5">
+                  <span className="text-[9px] uppercase tracking-[0.3em] text-[#606060] px-1">
+                    Experimental Directions
+                  </span>
+                  <Link
+                    to="/campaign"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center justify-between py-2 px-2.5 bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs tracking-wider rounded"
+                  >
+                    <span className="flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                      <span>✦ Deconstructed Campaign Hero</span>
+                    </span>
+                    <span className="text-xs">→</span>
+                  </Link>
+                  <Link
+                    to="/cinematic"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center justify-between py-2 px-2.5 bg-white/5 border border-white/10 text-white text-xs tracking-wider rounded"
+                  >
+                    <span className="flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      <span>● 3D Orbit Showcase</span>
+                    </span>
+                    <span className="text-xs">→</span>
+                  </Link>
+                </div>
               </nav>
 
               <div className="pt-2 text-[10px] tracking-wider text-[#606060] uppercase border-t border-white/5">
@@ -832,6 +870,12 @@ export default function App() {
         <Route
           path="/cinematic/product/:slug"
           element={<CinematicProductPage onAddToCart={addToCart} />}
+        />
+
+        {/* EXPERIMENTAL DECONSTRUCTED CAMPAIGN HERO (AAKAR HOUSE CONCEPT) */}
+        <Route
+          path="/campaign"
+          element={<CampaignExperiencePage />}
         />
 
         {/* ADMIN LUXURY OPERATIONS CENTER */}
