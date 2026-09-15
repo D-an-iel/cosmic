@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import campaignMasterImg from '../../assets/cosmic_campaign_master.jpg';
+import campaignMasterImg from '../../assets/cosmic_campaign_master.webp';
 import { ArrowDown } from 'lucide-react';
 
 // 5 Architectural Panels
