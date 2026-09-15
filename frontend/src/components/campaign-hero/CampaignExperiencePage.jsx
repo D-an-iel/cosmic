@@ -18,55 +18,60 @@ export default function CampaignExperiencePage() {
     <SmoothScrollProvider>
       <div className="min-h-screen bg-black text-white font-sans selection:bg-[#C0C0C0] selection:text-black antialiased relative">
         
-        {/* 1. TOP EXPERIMENTAL COMPARISON BAR */}
-        <div className="fixed top-0 left-0 right-0 z-50 bg-[#080808]/95 backdrop-blur-2xl border-b border-white/10 px-4 py-2 flex items-center justify-between text-[10px] uppercase tracking-[0.2em] text-[#A0A0A0] font-mono">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-white font-semibold">EXPERIMENTAL // AAKAR HOUSE SPLIT HERO</span>
+        {/* 1. UNIFIED LUXURY CAMPAIGN TOP BAR */}
+        <header className="fixed top-0 left-0 right-0 z-50 bg-[#050505]/90 backdrop-blur-2xl border-b border-white/10 px-6 py-3 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.2em] select-none">
+          {/* Brand Mark */}
+          <div className="flex items-center gap-3">
+            <Link to="/" className="font-serif text-lg tracking-[0.25em] font-light text-white hover:text-[#C0C0C0] transition-colors">
+              COSMIC
+            </Link>
+            <span className="hidden md:inline-block w-px h-3 bg-white/20" />
+            <span className="hidden md:inline-block text-[#808080] text-[9px] tracking-[0.3em]">
+              MMXXVI CAMPAIGN
+            </span>
           </div>
 
-          <div className="flex items-center gap-4">
+          {/* Center Story Indicator */}
+          <div className="hidden lg:flex items-center gap-2 text-[#909090]">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-[9px] tracking-[0.25em]">ARCHITECTURAL DECONSTRUCTION</span>
+          </div>
+
+          {/* Right Navigation Hub */}
+          <div className="flex items-center gap-5">
             <Link
               to="/cinematic"
-              className="text-[#C0C0C0] hover:text-white flex items-center gap-1 transition-colors"
-              title="Compare with 3D Three.js Orbit"
+              className="text-[#B0B0B0] hover:text-white flex items-center gap-1.5 transition-colors"
+              title="Compare with 3D Orbit"
             >
-              <Orbit className="w-3 h-3 text-[#A0A0A0]" />
+              <Orbit className="w-3.5 h-3.5 text-[#808080]" />
               <span className="hidden sm:inline">3D Orbit</span>
             </Link>
+
+            <Link
+              to="/wishlist"
+              className="text-[#B0B0B0] hover:text-white flex items-center gap-1.5 transition-colors"
+              title="Private Vault"
+            >
+              <Heart className="w-3.5 h-3.5 text-[#808080]" />
+              <span className="hidden sm:inline">Vault</span>
+              {wishlistCount > 0 && (
+                <span className="bg-white text-black font-bold text-[9px] px-1.5 py-0.2 rounded-full">
+                  {wishlistCount}
+                </span>
+              )}
+            </Link>
+
             <Link
               to="/"
-              className="text-[#C0C0C0] hover:text-white underline underline-offset-4 flex items-center gap-1 transition-colors"
-              title="Return to Production Baseline"
+              className="text-white/80 hover:text-white flex items-center gap-1 transition-colors pl-2 border-l border-white/15"
+              title="Return to Classic Storefront"
             >
               <ArrowLeft className="w-3 h-3" />
-              <span>Classic Storefront</span>
+              <span className="hidden sm:inline">Classic</span>
             </Link>
           </div>
-        </div>
-
-        {/* 2. MINIMAL BRAND ACCENT ON HERO */}
-        <div className="fixed top-10 left-6 z-40 pointer-events-none">
-          <span className="font-serif text-lg tracking-[0.3em] font-light chrome-gradient-text">
-            COSMIC
-          </span>
-        </div>
-
-        {/* 3. TOP RIGHT PRIVATE VAULT LINK */}
-        <div className="fixed top-10 right-6 z-40">
-          <Link
-            to="/wishlist"
-            className="p-2 rounded-full bg-black/60 border border-white/15 hover:border-white/40 text-white backdrop-blur-xl flex items-center gap-1.5 transition-all shadow-lg"
-            title="Private Vault"
-          >
-            <Heart className="w-3.5 h-3.5 text-[#C0C0C0]" />
-            {wishlistCount > 0 && (
-              <span className="bg-white text-black text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
-                {wishlistCount}
-              </span>
-            )}
-          </Link>
-        </div>
+        </header>
 
         {/* 4. PINNED SPLIT-IMAGE CAMPAIGN HERO (100% Storytelling, 5 Architectural Panels, Subtle Beacons) */}
         <DeconstructedCampaignHero />
@@ -104,24 +109,12 @@ export default function CampaignExperiencePage() {
           </div>
         </section>
 
-        {/* 6. SIDE-BY-SIDE FLOATING COMPARISON SWITCHER BAR */}
-        <div className="fixed bottom-6 left-6 z-40 flex items-center gap-2">
-          <Link
-            to="/"
-            className="px-4 py-2.5 rounded-full bg-black/90 hover:bg-black border border-white/30 hover:border-white/60 text-[10px] uppercase tracking-[0.2em] text-[#C0C0C0] hover:text-white backdrop-blur-2xl transition-all shadow-[0_10px_35px_rgba(0,0,0,0.9)] flex items-center gap-2 group cursor-pointer"
-          >
-            <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform text-white" />
-            <span>Classic Storefront</span>
-          </Link>
-
-          <Link
-            to="/cinematic"
-            className="px-4 py-2.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/25 hover:border-white/50 text-[10px] uppercase tracking-[0.2em] text-[#E0E0E0] hover:text-white backdrop-blur-2xl transition-all shadow-lg flex items-center gap-1.5"
-          >
-            <Orbit className="w-3.5 h-3.5 text-white" />
-            <span>3D Orbit</span>
-          </Link>
-        </div>
+        {/* 6. MINIMAL EDITORIAL ATELIER FOOTER */}
+        <footer className="py-12 px-6 bg-[#020202] border-t border-white/5 text-center select-none">
+          <p className="text-[10px] uppercase tracking-[0.3em] text-[#606060] font-mono">
+            COSMIC HAUTE JOAILLERIE S.P.A. • MILANESE ATELIER MMXXVI
+          </p>
+        </footer>
 
       </div>
     </SmoothScrollProvider>

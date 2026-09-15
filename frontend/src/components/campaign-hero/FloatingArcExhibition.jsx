@@ -116,30 +116,48 @@ export default function FloatingArcExhibition() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Pointer drag with momentum (Push -> Drift -> Settle)
+  // Pointer drag with momentum and vertical scroll preservation
   const dragStartXRef = useRef(0);
+  const dragStartYRef = useRef(0);
   const dragStartOffsetRef = useRef(targetX);
   const lastXRef = useRef(0);
   const lastTimeRef = useRef(0);
   const velocityRef = useRef(0);
+  const isHorizontalDragRef = useRef(false);
 
   const handlePointerDown = useCallback(
     (e) => {
-      setIsDragging(true);
       dragStartXRef.current = e.clientX || (e.touches && e.touches[0].clientX) || 0;
+      dragStartYRef.current = e.clientY || (e.touches && e.touches[0].clientY) || 0;
       dragStartOffsetRef.current = springX.get();
       lastXRef.current = dragStartXRef.current;
       lastTimeRef.current = performance.now();
       velocityRef.current = 0;
+      isHorizontalDragRef.current = false;
     },
     [springX]
   );
 
   const handlePointerMove = useCallback(
     (e) => {
-      if (!isDragging) return;
       const clientX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
+      const clientY = e.clientY || (e.touches && e.touches[0].clientY) || 0;
       const deltaX = clientX - dragStartXRef.current;
+      const deltaY = clientY - dragStartYRef.current;
+
+      // Lock direction on initial gesture: if vertical, let native page scroll flow
+      if (!isHorizontalDragRef.current && !isDragging) {
+        if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 6) {
+          return; // Native vertical scroll continues uninterrupted
+        }
+        if (Math.abs(deltaX) > 6) {
+          isHorizontalDragRef.current = true;
+          setIsDragging(true);
+        }
+      }
+
+      if (!isHorizontalDragRef.current) return;
+
       const now = performance.now();
       const dt = now - lastTimeRef.current;
 
@@ -155,8 +173,12 @@ export default function FloatingArcExhibition() {
   );
 
   const handlePointerUp = useCallback(() => {
-    if (!isDragging) return;
+    if (!isHorizontalDragRef.current && !isDragging) {
+      isHorizontalDragRef.current = false;
+      return;
+    }
     setIsDragging(false);
+    isHorizontalDragRef.current = false;
 
     const velocity = velocityRef.current; // px/ms
     const currentOffset = springX.get();
@@ -205,13 +227,15 @@ export default function FloatingArcExhibition() {
     <section
       id="featured-collection"
       className="relative h-[80vh] sm:h-[88vh] bg-[#000000] text-white flex flex-col justify-center overflow-hidden select-none"
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onPointerCancel={handlePointerUp}
     >
       {/* 1. STAGE: ONE ANIMATED MOTION CONTAINER MOVING PURE IMAGERY IN SPACE */}
-      <div className="relative w-full h-[60vh] sm:h-[68vh] flex items-center justify-center cursor-grab active:cursor-grabbing overflow-visible touch-pan-y">
+      <div
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
+        className="relative w-full h-[60vh] sm:h-[68vh] flex items-center justify-center cursor-grab active:cursor-grabbing overflow-visible touch-pan-y"
+      >
         <motion.div
           style={{
             x: springX,

@@ -17,6 +17,7 @@ export default function SmoothScrollProvider({ children }) {
     });
 
     lenisRef.current = lenis;
+    window.__lenis = lenis;
 
     function raf(time) {
       lenis.raf(time);
@@ -28,6 +29,7 @@ export default function SmoothScrollProvider({ children }) {
     return () => {
       cancelAnimationFrame(rafId);
       lenis.destroy();
+      delete window.__lenis;
     };
   }, []);
 

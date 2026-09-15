@@ -84,35 +84,39 @@ export default function DeconstructedCampaignHero() {
   });
 
   // 1. Image Split Progress: 0 at start, 1 at peak split
-  const splitProgress = useTransform(scrollYProgress, [0.15, 0.65], [0, 1]);
+  const splitProgress = useTransform(scrollYProgress, [0.08, 0.52], [0, 1]);
 
   // 2. Initial Brand Header Fade Out
-  const brandOpacity = useTransform(scrollYProgress, [0, 0.2], [1.0, 0.0]);
+  const brandOpacity = useTransform(scrollYProgress, [0, 0.16], [1.0, 0.0]);
 
   // 3. Deconstruction Metadata Fade In
   const deconstructMetaOpacity = useTransform(
     scrollYProgress,
-    [0.25, 0.4, 0.85, 0.95],
+    [0.2, 0.38, 0.82, 0.95],
     [0.0, 1.0, 1.0, 0.0]
   );
 
   // 4. Subtle Product Indicators Fade In
   const indicatorsOpacity = useTransform(
     scrollYProgress,
-    [0.32, 0.5, 0.88, 0.98],
-    [0.0, 1.0, 1.0, 0.2]
+    [0.28, 0.46, 0.84, 0.96],
+    [0.0, 1.0, 1.0, 0.0]
   );
 
   // 5. Scroll Prompt Fade Out
-  const scrollPromptOpacity = useTransform(scrollYProgress, [0, 0.12], [1.0, 0.0]);
+  const scrollPromptOpacity = useTransform(scrollYProgress, [0, 0.1], [1.0, 0.0]);
 
-  // 6. Cinematic Hero Exit Dissolve: panels fade away into dark obsidian
+  // 6. Cinematic Hero Exit Dissolve: panels fade away smoothly into dark obsidian
   const heroExitOpacity = useTransform(scrollYProgress, [0.82, 0.98], [1.0, 0.0]);
 
   const scrollToCollection = () => {
-    const el = document.getElementById('featured-collection');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
+    if (window.__lenis) {
+      window.__lenis.scrollTo('#featured-collection', { duration: 1.2 });
+    } else {
+      const el = document.getElementById('featured-collection');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
     }
   };
 
@@ -121,7 +125,7 @@ export default function DeconstructedCampaignHero() {
   };
 
   return (
-    <div ref={containerRef} className="relative w-full h-[280vh] bg-black">
+    <div ref={containerRef} className="relative w-full h-[210vh] bg-black">
       {/* PINNED HERO VIEWPORT */}
       <div className="sticky top-0 h-screen w-full overflow-hidden bg-black flex flex-col items-center justify-center select-none px-4 sm:px-8">
         

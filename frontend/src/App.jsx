@@ -199,15 +199,19 @@ export default function App() {
         return cat.includes(search.toLowerCase());
       });
 
-  const isAdminRoute = location.pathname.startsWith('/admin');
-  const isCheckoutOrSuccess = location.pathname === '/checkout' || location.pathname === '/order-success' || isAdminRoute;
+  const isDedicatedExperience =
+    location.pathname.startsWith('/admin') ||
+    location.pathname.startsWith('/campaign') ||
+    location.pathname.startsWith('/cinematic') ||
+    location.pathname === '/checkout' ||
+    location.pathname === '/order-success';
 
   return (
     <div className="min-h-screen bg-black text-white font-sans selection:bg-[#C0C0C0] selection:text-black antialiased relative">
       <ScrollToTop />
 
-      {/* 0. APPLICATION LOADING STATE */}
-      {appLoading && <LoadingScreen />}
+      {/* 0. APPLICATION LOADING STATE (Only on standard storefront pages) */}
+      {appLoading && !isDedicatedExperience && <LoadingScreen />}
 
       {/* 1. CINEMATIC LUXURY BRAND INTRO */}
       {introActive && (
@@ -229,8 +233,8 @@ export default function App() {
         </div>
       )}
 
-      {/* 2. TOP ANNOUNCEMENT BAR (Hidden on checkout to keep focus) */}
-      {!isCheckoutOrSuccess && (
+      {/* 2. TOP ANNOUNCEMENT BAR (Hidden on dedicated experiences) */}
+      {!isDedicatedExperience && (
         <div className="bg-[#0A0A0A] border-b border-[#222222] py-2 px-4 text-[11px] uppercase tracking-[0.25em] text-center text-[#A0A0A0] flex items-center justify-center gap-4">
           <span>Complimentary Express Air Courier</span>
           <span className="text-[#444444]">•</span>
@@ -243,8 +247,8 @@ export default function App() {
         </div>
       )}
 
-      {/* 3. STICKY LUXURY NAVBAR */}
-      {!isCheckoutOrSuccess && (
+      {/* 3. STICKY LUXURY NAVBAR (Hidden on dedicated experiences) */}
+      {!isDedicatedExperience && (
         <header className="sticky top-0 z-40 bg-black/85 backdrop-blur-xl border-b border-white/10 transition-colors duration-300 font-aileron">
           <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
 
@@ -945,8 +949,8 @@ export default function App() {
         />
       </Routes>
 
-      {/* 4. FOOTER (Hidden on Checkout & Order Success) */}
-      {!isCheckoutOrSuccess && (
+      {/* 4. FOOTER (Hidden on dedicated experiences) */}
+      {!isDedicatedExperience && (
         <footer className="border-t border-white/10 bg-[#030303] py-20 px-6 font-aileron">
           <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16">
 
