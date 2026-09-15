@@ -20,7 +20,7 @@ import ScrollToTop from './components/ScrollToTop.jsx';
 import { PRODUCTS as STATIC_PRODUCTS } from './data/products.js';
 import { useWishlist } from './context/WishlistContext.jsx';
 import LuxuryWishlistVault from './components/luxury-mobile/LuxuryWishlistVault.jsx';
-import CinematicExperiencePage from './components/luxury-mobile/CinematicExperiencePage.jsx';
+import ExperimentalExperience from './components/experimental/ExperimentalExperience.jsx';
 import CinematicProductPage from './components/luxury-mobile/CinematicProductPage.jsx';
 import CurvedRecommendationCarousel from './components/luxury-mobile/CurvedRecommendationCarousel.jsx';
 import AdminGuard from './components/admin/AdminGuard.jsx';
@@ -827,7 +827,7 @@ export default function App() {
         {/* EXPERIMENTAL CINEMATIC BRANCH ROUTES */}
         <Route
           path="/cinematic"
-          element={<CinematicExperiencePage />}
+          element={<ExperimentalExperience />}
         />
         <Route
           path="/cinematic/product/:slug"
