@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import { motion, AnimatePresence, useSpring } from 'framer-motion';
+import { motion, useSpring } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useImagePreloader } from './useImagePreloader.js';
 
@@ -103,6 +103,19 @@ export default function FloatingArcExhibition() {
     springX.set(targetX);
   }, [targetX, springX]);
 
+  // Keyboard navigation (Left / Right arrow keys)
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'ArrowRight') {
+        setActiveIndex((prev) => Math.min(EXHIBITION_PIECES.length - 1, prev + 1));
+      } else if (e.key === 'ArrowLeft') {
+        setActiveIndex((prev) => Math.max(0, prev - 1));
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   // Pointer drag with momentum (Push -> Drift -> Settle)
   const dragStartXRef = useRef(0);
   const dragStartOffsetRef = useRef(targetX);
@@ -180,8 +193,6 @@ export default function FloatingArcExhibition() {
     return list;
   }, [activeIndex]);
 
-  const activePiece = EXHIBITION_PIECES[activeIndex];
-
   if (!imagesReady) {
     return (
       <section className="h-[80vh] sm:h-[85vh] bg-[#000000] flex items-center justify-center">
@@ -200,7 +211,7 @@ export default function FloatingArcExhibition() {
       onPointerCancel={handlePointerUp}
     >
       {/* 1. STAGE: ONE ANIMATED MOTION CONTAINER MOVING PURE IMAGERY IN SPACE */}
-      <div className="relative w-full h-[60vh] sm:h-[68vh] flex items-center justify-center cursor-grab active:cursor-grabbing overflow-visible">
+      <div className="relative w-full h-[60vh] sm:h-[68vh] flex items-center justify-center cursor-grab active:cursor-grabbing overflow-visible touch-pan-y">
         <motion.div
           style={{
             x: springX,
@@ -238,7 +249,7 @@ export default function FloatingArcExhibition() {
                 }}
                 className="cursor-pointer select-none flex flex-col items-center top-1/2"
               >
-                {/* PURE FLOATING PHOTOGRAPHY (Zero containers, Zero borders, Zero buttons) */}
+                {/* PURE FLOATING PHOTOGRAPHY WITH OVERLAID EDITORIAL INFORMATION */}
                 <div className="relative aspect-[4/5] w-full rounded-2xl overflow-hidden shadow-[0_25px_65px_rgba(0,0,0,0.95)]">
                   <img
                     src={piece.image}
@@ -250,10 +261,25 @@ export default function FloatingArcExhibition() {
                         : 'filter brightness-75 contrast-90'
                     }`}
                   />
+
                   {/* Subtle rim light accent on centered piece */}
                   {isCenter && (
                     <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/10 pointer-events-none" />
                   )}
+
+                  {/* BOTTOM-LEFT OVERLAY: Title & Price anchored inside active image card */}
+                  <div
+                    className={`absolute inset-x-0 bottom-0 pt-20 pb-4 sm:pb-5 px-4 sm:px-5 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none transition-opacity duration-400 ease-out flex flex-col justify-end text-left ${
+                      isCenter ? 'opacity-100' : 'opacity-0'
+                    }`}
+                  >
+                    <h4 className="font-serif text-lg sm:text-xl text-white font-light tracking-wide leading-tight drop-shadow-md">
+                      {piece.name}
+                    </h4>
+                    <p className="font-mono text-xs sm:text-sm text-white/80 tracking-wider pt-1 drop-shadow-sm">
+                      ₹{piece.price.toLocaleString('en-IN')}
+                    </p>
+                  </div>
                 </div>
 
                 {/* Soft diffused cast shadow */}
@@ -267,29 +293,8 @@ export default function FloatingArcExhibition() {
         </motion.div>
       </div>
 
-      {/* 2. BOTTOM-LEFT MINIMALIST PRODUCT INFORMATION */}
-      <div className="absolute bottom-6 left-6 sm:bottom-10 sm:left-12 z-30 pointer-events-none select-none">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activePiece.id}
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: 0.25, ease: 'easeOut' }}
-            className="space-y-0.5"
-          >
-            <h4 className="font-serif text-xl sm:text-2xl text-white font-light tracking-wide">
-              {activePiece.name}
-            </h4>
-            <p className="font-mono text-xs sm:text-sm text-[#888888] tracking-widest pt-0.5">
-              ₹{activePiece.price.toLocaleString('en-IN')}
-            </p>
-          </motion.div>
-        </AnimatePresence>
-      </div>
-
-      {/* 3. BOTTOM-RIGHT SUBTLE INDEX COUNTER */}
-      <div className="absolute bottom-6 right-6 sm:bottom-10 sm:right-12 z-30 pointer-events-none select-none">
+      {/* 2. SUBTLE INDEX COUNTER IN BOTTOM-RIGHT CORNER */}
+      <div className="absolute bottom-6 right-6 sm:bottom-8 sm:right-10 z-30 pointer-events-none select-none">
         <span className="text-[10px] font-mono tracking-[0.25em] text-[#555555]">
           0{activeIndex + 1} / 0{EXHIBITION_PIECES.length}
         </span>
