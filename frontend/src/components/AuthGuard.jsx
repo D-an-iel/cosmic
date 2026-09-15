@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import OtpLoginModal from './modals/OtpLoginModal';
+import LuxuryAuthModal from './luxury-flow/LuxuryAuthModal';
 
 /**
  * AuthGuard enforces absolute authentication for protected routes.
@@ -44,7 +44,7 @@ export default function AuthGuard({ children }) {
   // We render the Auth Modal and a stark black background.
   return (
     <div className="fixed inset-0 z-[2000] bg-black overflow-hidden">
-      <OtpLoginModal
+      <LuxuryAuthModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onLoginSuccess={() => setIsModalOpen(false)}

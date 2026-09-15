@@ -24,16 +24,23 @@ enum PaymentStatus {
   CHARGEBACK
 }
 
+enum UserRole {
+  CUSTOMER
+  ADMIN
+}
+
 model User {
   id        String    @id @default(uuid())
   name      String
   email     String    @unique
   phone     String?
   password  String
+  role      UserRole  @default(CUSTOMER)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   addresses Address[]
   orders    Order[]
+  wishlist  Wishlist[]
 }
 
 model Address {
@@ -70,6 +77,7 @@ model Product {
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
   orderItems    OrderItem[]
+  wishlist      Wishlist[]
 
   @@index([category])
   @@index([slug])
@@ -128,4 +136,17 @@ model Otp {
   expiresAt DateTime
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Wishlist {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+  @@index([userId])
+  @@index([productId])
 }

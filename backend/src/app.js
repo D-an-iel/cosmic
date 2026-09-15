@@ -8,6 +8,8 @@ import productRoutes from './routes/product.js';
 import addressRoutes from './routes/address.js';
 import orderRoutes from './routes/order.js';
 import paymentRoutes from './routes/payment.js';
+import adminRoutes from './routes/admin.js';
+import wishlistRoutes from './routes/wishlist.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 const app = express();
@@ -22,6 +24,8 @@ app.use('/api/products', productRoutes);
 app.use('/api/addresses', addressRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/wishlist', wishlistRoutes);
 
 // catch-all 404
 app.use((req, res) => {

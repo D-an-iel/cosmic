@@ -18,7 +18,7 @@ class AuthService {
       password: hashedPassword,
     });
 
-    const token = signToken({ id: user.id, email: user.email });
+    const token = signToken({ id: user.id, email: user.email, role: user.role });
 
     return {
       user: {
@@ -26,6 +26,7 @@ class AuthService {
         name: user.name,
         email: user.email,
         phone: user.phone,
+        role: user.role,
       },
       token,
     };
@@ -42,7 +43,7 @@ class AuthService {
       throw new Error('Invalid email or password');
     }
 
-    const token = signToken({ id: user.id, email: user.email });
+    const token = signToken({ id: user.id, email: user.email, role: user.role });
 
     return {
       user: {
@@ -50,6 +51,7 @@ class AuthService {
         name: user.name,
         email: user.email,
         phone: user.phone,
+        role: user.role,
       },
       token,
     };
@@ -101,7 +103,7 @@ class AuthService {
       user = await userRepository.createUserByPhone(phone);
     }
 
-    const token = signToken({ id: user.id, email: user.email });
+    const token = signToken({ id: user.id, email: user.email, role: user.role });
 
     // Consume OTP
     await otpRepository.deleteOtp(phone);
@@ -112,6 +114,7 @@ class AuthService {
         name: user.name,
         email: user.email,
         phone: user.phone,
+        role: user.role,
       },
       token,
     };
@@ -128,6 +131,7 @@ class AuthService {
       name: user.name,
       email: user.email,
       phone: user.phone,
+      role: user.role,
     };
   }
 }

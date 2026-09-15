@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getProductBySlug, getRelatedProducts, COLOR_VARIANTS, SIZE_VARIANTS } from '../data/products';
 import { useAuth } from '../context/AuthContext';
-import OtpLoginModal from './modals/OtpLoginModal';
+import LuxuryAuthModal from './luxury-flow/LuxuryAuthModal';
+import EditorialProductView from './luxury-mobile/EditorialProductView.jsx';
 
 export default function ProductDetails({ onAddToCart }) {
   const { slug } = useParams();
@@ -73,6 +74,7 @@ export default function ProductDetails({ onAddToCart }) {
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
   const [lightboxImage, setLightboxImage] = useState(null);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [viewMode, setViewMode] = useState('dossier');
 
   // Ensure scroll is at top on mount
   useEffect(() => {
@@ -217,11 +219,32 @@ export default function ProductDetails({ onAddToCart }) {
     );
   }
 
+  if (viewMode === 'editorial') {
+    return (
+      <div className="relative">
+        <div className="fixed top-3.5 right-16 z-40">
+          <button
+            type="button"
+            onClick={() => setViewMode('dossier')}
+            className="px-3 py-1.5 rounded-full bg-black/60 border border-white/20 text-[9px] uppercase tracking-[0.25em] text-[#C0C0C0] hover:text-white backdrop-blur-md transition-all shadow-lg cursor-pointer"
+            title="Switch to detailed technical dossier"
+          >
+            Technical Dossier ↗
+          </button>
+        </div>
+        <EditorialProductView
+          product={product}
+          onAddToCart={onAddToCart}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="bg-[#000000] text-white min-h-screen font-sans selection:bg-[#C0C0C0] selection:text-black">
       
       {/* 1. BREADCRUMB */}
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-12 pt-4 pb-2">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-12 pt-4 pb-2 flex items-center justify-between">
         <nav aria-label="Breadcrumb" className="flex items-center space-x-2 text-[10px] uppercase tracking-[0.25em] text-[#707070]">
           <Link to="/" className="hover:text-white transition-colors">
             Maison
@@ -233,6 +256,14 @@ export default function ProductDetails({ onAddToCart }) {
           <span className="text-[#333333]">/</span>
           <span className="text-white font-medium tracking-wider truncate">{product.name}</span>
         </nav>
+
+        <Link
+          to={`/cinematic/product/${slug}`}
+          className="px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/25 text-[10px] uppercase tracking-[0.2em] text-[#E0E0E0] hover:text-white transition-all cursor-pointer flex items-center gap-2 shadow-sm"
+        >
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <span>Compare: Cinematic Snap View →</span>
+        </Link>
       </div>
 
       {/* ========================================================================= */}
@@ -881,7 +912,7 @@ export default function ProductDetails({ onAddToCart }) {
         </div>
       )}
 
-      <OtpLoginModal
+      <LuxuryAuthModal
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
         onLoginSuccess={() => {

@@ -33,3 +33,14 @@ export const protect = (req, res, next) => {
     });
   }
 };
+
+export const isAdmin = (req, res, next) => {
+  if (req.user && req.user.role === 'ADMIN') {
+    next();
+  } else {
+    return res.status(403).json({
+      success: false,
+      message: 'Forbidden: Admin access required',
+    });
+  }
+};

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from './context/AuthContext.jsx';
-import OtpLoginModal from './components/modals/OtpLoginModal.jsx';
+import LuxuryAuthModal from './components/luxury-flow/LuxuryAuthModal.jsx';
 import AuthGuard from './components/AuthGuard.jsx';
 import heroEditorial from './assets/hero_editorial.jpg';
 import lunarImg from './assets/lunar_collection.jpg';
@@ -15,13 +15,38 @@ import OrderSuccessPage from './components/OrderSuccessPage.jsx';
 import PaymentTestPage from './components/PaymentTestPage.jsx';
 import AccountPage from './components/AccountPage.jsx';
 import OrderDetailsPage from './components/OrderDetailsPage.jsx';
+import OrderTrackingPage from './components/account/OrderTrackingPage.jsx';
 import ScrollToTop from './components/ScrollToTop.jsx';
 import { PRODUCTS as STATIC_PRODUCTS } from './data/products.js';
+import { useWishlist } from './context/WishlistContext.jsx';
+import LuxuryWishlistVault from './components/luxury-mobile/LuxuryWishlistVault.jsx';
+import CinematicExperiencePage from './components/luxury-mobile/CinematicExperiencePage.jsx';
+import CinematicProductPage from './components/luxury-mobile/CinematicProductPage.jsx';
+import CurvedRecommendationCarousel from './components/luxury-mobile/CurvedRecommendationCarousel.jsx';
+import AdminGuard from './components/admin/AdminGuard.jsx';
+import AdminLayout from './components/admin/AdminLayout.jsx';
+import AdminDashboard from './components/admin/AdminDashboard.jsx';
+import AdminOrders from './components/admin/AdminOrders.jsx';
+import AdminOrderDetail from './components/admin/AdminOrderDetail.jsx';
+import AdminProducts from './components/admin/AdminProducts.jsx';
+import AdminCustomers from './components/admin/AdminCustomers.jsx';
+import AdminLogin from './components/admin/AdminLogin.jsx';
 
 export default function App() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
+  const { wishlistCount } = useWishlist();
+  const [scrolledPastHero, setScrolledPastHero] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolledPastHero(window.scrollY > 120);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const [isGlobalLoginModalOpen, setIsGlobalLoginModalOpen] = useState(false);
   const [accountDropdownOpen, setAccountDropdownOpen] = useState(false);
   const accountDropdownRef = useRef(null);
@@ -173,7 +198,8 @@ export default function App() {
         return cat.includes(search.toLowerCase());
       });
 
-  const isCheckoutOrSuccess = location.pathname === '/checkout' || location.pathname === '/order-success';
+  const isAdminRoute = location.pathname.startsWith('/admin');
+  const isCheckoutOrSuccess = location.pathname === '/checkout' || location.pathname === '/order-success' || isAdminRoute;
 
   return (
     <div className="min-h-screen bg-black text-white font-sans selection:bg-[#C0C0C0] selection:text-black antialiased relative">
@@ -338,7 +364,7 @@ export default function App() {
                       className="text-xs uppercase tracking-[0.2em] text-[#E0E0E0] hover:text-white transition-colors py-1 flex items-center gap-1.5 cursor-pointer group"
                     >
                       <span className="truncate max-w-[130px]">
-                        {user.name ? `Hello, ${user.name.split(' ')[0]}` : 'Account'}
+                        {user.name && user.name !== 'OTP User' ? `Hello, ${user.name.split(' ')[0]}` : (user.phone ? user.phone : 'Account')}
                       </span>
                       <svg
                         className={`w-3 h-3 text-[#A0A0A0] transition-transform duration-200 ${accountDropdownOpen ? 'rotate-180 text-white' : ''}`}
@@ -367,15 +393,15 @@ export default function App() {
 
                         <div className="space-y-1 text-xs">
                           <Link
-                            to="/account?tab=orders"
+                            to="/account"
                             onClick={() => setAccountDropdownOpen(false)}
                             className="flex items-center justify-between py-2 px-2.5 text-[#C0C0C0] hover:text-white hover:bg-white/5 transition-colors uppercase tracking-[0.15em] text-[11px]"
                           >
-                            <span>My Orders</span>
+                            <span>Profile</span>
                             <span className="text-[#666666] text-[10px]">→</span>
                           </Link>
                           <Link
-                            to="/account?tab=addresses"
+                            to="/account/addresses"
                             onClick={() => setAccountDropdownOpen(false)}
                             className="flex items-center justify-between py-2 px-2.5 text-[#C0C0C0] hover:text-white hover:bg-white/5 transition-colors uppercase tracking-[0.15em] text-[11px]"
                           >
@@ -383,13 +409,40 @@ export default function App() {
                             <span className="text-[#666666] text-[10px]">→</span>
                           </Link>
                           <Link
-                            to="/account"
+                            to="/account/orders"
                             onClick={() => setAccountDropdownOpen(false)}
                             className="flex items-center justify-between py-2 px-2.5 text-[#C0C0C0] hover:text-white hover:bg-white/5 transition-colors uppercase tracking-[0.15em] text-[11px]"
                           >
-                            <span>Client Registry</span>
+                            <span>My Orders</span>
                             <span className="text-[#666666] text-[10px]">→</span>
                           </Link>
+                          <Link
+                            to="/wishlist"
+                            onClick={() => setAccountDropdownOpen(false)}
+                            className="flex items-center justify-between py-2 px-2.5 text-[#C0C0C0] hover:text-white hover:bg-white/5 transition-colors uppercase tracking-[0.15em] text-[11px]"
+                          >
+                            <span className="flex items-center gap-2">
+                              <span>Private Vault</span>
+                              {wishlistCount > 0 && (
+                                <span className="px-1.5 py-0.2 bg-white text-black font-bold text-[9px] rounded-full">
+                                  {wishlistCount}
+                                </span>
+                              )}
+                            </span>
+                            <span className="text-[#666666] text-[10px]">→</span>
+                          </Link>
+                          {user?.role === 'ADMIN' && (
+                            <Link
+                              to="/admin/dashboard"
+                              onClick={() => setAccountDropdownOpen(false)}
+                              className="flex items-center justify-between py-2 px-2.5 bg-white/10 hover:bg-white/15 text-white transition-colors uppercase tracking-[0.15em] text-[11px] font-semibold border border-white/20 mt-1"
+                            >
+                              <span className="flex items-center gap-1.5 text-[#C0C0C0]">
+                                <span className="text-emerald-400">●</span> Atelier Operations
+                              </span>
+                              <span className="text-white text-[10px]">→</span>
+                            </Link>
+                          )}
                         </div>
 
                         <div className="pt-2 mt-2 border-t border-white/10">
@@ -408,6 +461,37 @@ export default function App() {
                   </div>
                 )}
               </div>
+
+              {/* Experimental Preview Switcher */}
+              <Link
+                to="/cinematic"
+                className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-[10px] uppercase tracking-[0.15em] text-[#C0C0C0] hover:text-white transition-all cursor-pointer"
+                title="View experimental mobile-first cinematic experience"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span>Cinematic Preview</span>
+              </Link>
+
+              {/* Private Vault / Wishlist */}
+              <Link
+                to="/wishlist"
+                className="relative p-2 text-white hover:text-[#C0C0C0] transition-colors flex items-center gap-1.5 group cursor-pointer"
+                aria-label="Private Vault"
+              >
+                <span className="text-sm tracking-wide hidden sm:inline text-[#A0A0A0] group-hover:text-white">
+                  Vault
+                </span>
+                <div className="relative">
+                  <svg className="w-5 h-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                  {wishlistCount > 0 && (
+                    <span className="absolute -top-1.5 -right-2 bg-white text-black text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                      {wishlistCount}
+                    </span>
+                  )}
+                </div>
+              </Link>
 
               {/* Shopping Bag */}
               <button
@@ -476,15 +560,15 @@ export default function App() {
 
                     <div className="grid grid-cols-1 gap-1 text-xs uppercase tracking-[0.15em]">
                       <Link
-                        to="/account?tab=orders"
+                        to="/account"
                         onClick={() => setMobileMenuOpen(false)}
                         className="py-2.5 min-h-[44px] flex items-center justify-between text-[#C0C0C0] hover:text-white border-b border-white/5"
                       >
-                        <span>My Orders</span>
+                        <span>Profile</span>
                         <span className="text-[#606060] text-xs">→</span>
                       </Link>
                       <Link
-                        to="/account?tab=addresses"
+                        to="/account/addresses"
                         onClick={() => setMobileMenuOpen(false)}
                         className="py-2.5 min-h-[44px] flex items-center justify-between text-[#C0C0C0] hover:text-white border-b border-white/5"
                       >
@@ -492,13 +576,50 @@ export default function App() {
                         <span className="text-[#606060] text-xs">→</span>
                       </Link>
                       <Link
-                        to="/account"
+                        to="/account/orders"
                         onClick={() => setMobileMenuOpen(false)}
                         className="py-2.5 min-h-[44px] flex items-center justify-between text-[#C0C0C0] hover:text-white border-b border-white/5"
                       >
-                        <span>Client Registry</span>
+                        <span>My Orders</span>
                         <span className="text-[#606060] text-xs">→</span>
                       </Link>
+                      <Link
+                        to="/cinematic"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="py-2.5 min-h-[44px] flex items-center justify-between text-white font-medium bg-white/5 px-2 my-1 border border-white/15"
+                      >
+                        <span className="flex items-center gap-2 text-xs uppercase tracking-wider">
+                          <span className="text-emerald-400">✦</span> Cinematic Experience
+                        </span>
+                        <span className="text-white text-xs">→</span>
+                      </Link>
+                      <Link
+                        to="/wishlist"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="py-2.5 min-h-[44px] flex items-center justify-between text-[#C0C0C0] hover:text-white border-b border-white/5"
+                      >
+                        <span className="flex items-center gap-2">
+                          <span>Private Vault (Wishlist)</span>
+                          {wishlistCount > 0 && (
+                            <span className="px-1.5 py-0.5 text-[9px] bg-white text-black font-bold rounded-full">
+                              {wishlistCount}
+                            </span>
+                          )}
+                        </span>
+                        <span className="text-[#606060] text-xs">→</span>
+                      </Link>
+                      {user?.role === 'ADMIN' && (
+                        <Link
+                          to="/admin/dashboard"
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="py-2.5 min-h-[44px] flex items-center justify-between text-white font-medium bg-white/10 px-2 my-1 border border-white/20"
+                        >
+                          <span className="flex items-center gap-2 text-xs uppercase tracking-wider">
+                            <span className="text-emerald-400">●</span> Atelier Operations
+                          </span>
+                          <span className="text-white text-xs">→</span>
+                        </Link>
+                      )}
                     </div>
 
                     <div className="pt-2">
@@ -627,12 +748,36 @@ export default function App() {
           }
         />
 
-        {/* DEDICATED CHECKOUT PAGE ROUTE */}
+        {/* ACCOUNT & DEDICATED ORDER ROUTES */}
         <Route
           path="/account"
           element={
             <AuthGuard>
-              <AccountPage />
+              <AccountPage onAddToCart={addToCart} onOpenCart={() => setCartOpen(true)} />
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/account/orders"
+          element={
+            <AuthGuard>
+              <AccountPage onAddToCart={addToCart} onOpenCart={() => setCartOpen(true)} />
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/account/addresses"
+          element={
+            <AuthGuard>
+              <AccountPage onAddToCart={addToCart} onOpenCart={() => setCartOpen(true)} />
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/account/orders/:id"
+          element={
+            <AuthGuard>
+              <OrderDetailsPage onAddToCart={addToCart} onOpenCart={() => setCartOpen(true)} />
             </AuthGuard>
           }
         />
@@ -640,7 +785,15 @@ export default function App() {
           path="/account/order/:id"
           element={
             <AuthGuard>
-              <OrderDetailsPage />
+              <OrderDetailsPage onAddToCart={addToCart} onOpenCart={() => setCartOpen(true)} />
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/account/orders/:id/tracking"
+          element={
+            <AuthGuard>
+              <OrderTrackingPage />
             </AuthGuard>
           }
         />
@@ -664,6 +817,87 @@ export default function App() {
         <Route
           path="/payment-test"
           element={<PaymentTestPage />}
+        />
+        {/* LUXURY WISHLIST VAULT */}
+        <Route
+          path="/wishlist"
+          element={<LuxuryWishlistVault />}
+        />
+
+        {/* EXPERIMENTAL CINEMATIC BRANCH ROUTES */}
+        <Route
+          path="/cinematic"
+          element={<CinematicExperiencePage />}
+        />
+        <Route
+          path="/cinematic/product/:slug"
+          element={<CinematicProductPage onAddToCart={addToCart} />}
+        />
+
+        {/* ADMIN LUXURY OPERATIONS CENTER */}
+        <Route
+          path="/admin"
+          element={
+            <AdminGuard>
+              <AdminLayout>
+                <AdminDashboard />
+              </AdminLayout>
+            </AdminGuard>
+          }
+        />
+        <Route
+          path="/admin/dashboard"
+          element={
+            <AdminGuard>
+              <AdminLayout>
+                <AdminDashboard />
+              </AdminLayout>
+            </AdminGuard>
+          }
+        />
+        <Route
+          path="/admin/orders"
+          element={
+            <AdminGuard>
+              <AdminLayout>
+                <AdminOrders />
+              </AdminLayout>
+            </AdminGuard>
+          }
+        />
+        <Route
+          path="/admin/orders/:id"
+          element={
+            <AdminGuard>
+              <AdminLayout>
+                <AdminOrderDetail />
+              </AdminLayout>
+            </AdminGuard>
+          }
+        />
+        <Route
+          path="/admin/products"
+          element={
+            <AdminGuard>
+              <AdminLayout>
+                <AdminProducts />
+              </AdminLayout>
+            </AdminGuard>
+          }
+        />
+        <Route
+          path="/admin/customers"
+          element={
+            <AdminGuard>
+              <AdminLayout>
+                <AdminCustomers />
+              </AdminLayout>
+            </AdminGuard>
+          }
+        />
+        <Route
+          path="/admin/login"
+          element={<AdminLogin />}
         />
       </Routes>
 
@@ -911,6 +1145,20 @@ export default function App() {
                     ))
                   )}
                 </div>
+
+                {/* Curved Recommendation Carousel */}
+                {allProducts.length > 0 && (
+                  <div className="pt-4 border-t border-white/10 mt-4">
+                    <CurvedRecommendationCarousel
+                      products={allProducts.filter((p) => !cart.some((c) => c.productId === p.id || c.slug === p.slug))}
+                      title="COMPLETE THE SUITE"
+                      onProductClick={(recProduct) => {
+                        setCartOpen(false);
+                        navigate(`/product/${recProduct.slug}`);
+                      }}
+                    />
+                  </div>
+                )}
               </div>
 
               {/* Drawer Footer */}
@@ -950,10 +1198,17 @@ export default function App() {
       )}
 
       {/* GLOBAL AUTH MODAL */}
-      <OtpLoginModal
+      <LuxuryAuthModal
         isOpen={isGlobalLoginModalOpen}
         onClose={() => setIsGlobalLoginModalOpen(false)}
-        onLoginSuccess={() => setIsGlobalLoginModalOpen(false)}
+        onLoginSuccess={(loggedInUser) => {
+          setIsGlobalLoginModalOpen(false);
+          const patronName = loggedInUser?.name && loggedInUser?.name !== 'OTP User'
+            ? loggedInUser.name
+            : (loggedInUser?.phone || 'Patron');
+          showToast(`✦ Welcome to Maison Cosmic, ${patronName}`);
+          navigate('/account');
+        }}
       />
     </div>
   );
@@ -972,7 +1227,7 @@ function HomePageContent({
 }) {
   return (
     <div className="flex flex-col w-full">
-      {/* 1. HERO SECTION */}
+      {/* 1. HERO SECTION (Classic Cosmic Storefront) */}
       <section className="relative h-[90vh] w-full overflow-hidden flex items-center justify-center text-center px-4">
         <div className="absolute inset-0 z-0">
           <img
@@ -1134,7 +1389,7 @@ function HomePageContent({
             </p>
             <p className="text-sm text-[#A0A0A0] font-light leading-relaxed tracking-wide">
               Each piece is individually hand-finished in our Milanese atelier, ensuring
-              that the geometry of the void is captured in every bevel and curve.
+              that the geometry of the cosmos is captured in every bevel and curve.
             </p>
             <div className="pt-4">
               <a href="/#shop" className="text-xs uppercase tracking-widest text-white border-b border-white/30 pb-1 hover:border-white transition-all">
@@ -1176,6 +1431,18 @@ function HomePageContent({
           </button>
         </form>
       </section>
+
+      {/* SIDE-BY-SIDE COMPARISON SWITCHER PILL */}
+      <div className="fixed bottom-6 left-6 z-40">
+        <Link
+          to="/cinematic"
+          className="px-4 py-2.5 rounded-full bg-black/85 hover:bg-[#111] border border-white/25 hover:border-white/60 text-[10px] uppercase tracking-[0.2em] text-[#C0C0C0] hover:text-white backdrop-blur-xl transition-all shadow-[0_10px_35px_rgba(0,0,0,0.85)] flex items-center gap-2.5 group cursor-pointer"
+        >
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          <span>Compare: Experimental Cinematic Mode</span>
+          <span className="text-white group-hover:translate-x-1 transition-transform">→</span>
+        </Link>
+      </div>
     </div>
   );
 }
