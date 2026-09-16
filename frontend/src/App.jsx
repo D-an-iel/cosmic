@@ -1,12 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useAuth } from './context/AuthContext.jsx';
 import LuxuryAuthModal from './components/luxury-flow/LuxuryAuthModal.jsx';
 import AuthGuard from './components/AuthGuard.jsx';
-import heroEditorial from './assets/hero_editorial.jpg';
 import lunarImg from './assets/lunar_collection.jpg';
-import novaImg from './assets/nova_collection.jpg';
-import eclipseImg from './assets/eclipse_collection.jpg';
 import CinematicIntro from './components/CinematicIntro.jsx';
 import LoadingScreen from './components/LoadingScreen.jsx';
 import ProductDetails from './components/ProductDetails.jsx';
@@ -20,10 +18,15 @@ import ScrollToTop from './components/ScrollToTop.jsx';
 import { PRODUCTS as STATIC_PRODUCTS } from './data/products.js';
 import { useWishlist } from './context/WishlistContext.jsx';
 import LuxuryWishlistVault from './components/luxury-mobile/LuxuryWishlistVault.jsx';
-import ExperimentalExperience from './components/experimental/ExperimentalExperience.jsx';
-import CinematicProductPage from './components/luxury-mobile/CinematicProductPage.jsx';
-import CampaignExperiencePage from './components/campaign-hero/CampaignExperiencePage.jsx';
-import CurvedRecommendationCarousel from './components/luxury-mobile/CurvedRecommendationCarousel.jsx';
+import ArchitecturalCampaignHero from './components/campaign-hero/ArchitecturalCampaignHero.jsx';
+import CollectionsPage from './pages/CollectionsPage.jsx';
+import EditorialFeaturedPieces from './components/storytelling/EditorialFeaturedPieces.jsx';
+import BrandStory from './components/storytelling/BrandStory.jsx';
+import CollectionsPreview from './components/storytelling/CollectionsPreview.jsx';
+import Craftsmanship from './components/storytelling/Craftsmanship.jsx';
+import SocialProof from './components/storytelling/SocialProof.jsx';
+import Footer from './components/layout/Footer.jsx';
+
 import AdminGuard from './components/admin/AdminGuard.jsx';
 import AdminLayout from './components/admin/AdminLayout.jsx';
 import AdminDashboard from './components/admin/AdminDashboard.jsx';
@@ -78,11 +81,13 @@ export default function App() {
     navigate('/');
   };
 
-  // Intro state - only play on root homepage when not previously dismissed in session
+  // Permanent Brand Intro / Loading Screen - always plays when entering the root homepage
   const [introActive, setIntroActive] = useState(() => {
     if (typeof window !== 'undefined') {
-      const isRoot = window.location.pathname === '/' || window.location.pathname === '';
-      return isRoot; // Temporarily removed session check to ensure visibility during testing
+      try {
+        sessionStorage.removeItem('cosmic_intro_seen');
+      } catch (e) {}
+      return window.location.pathname === '/' || window.location.pathname === '';
     }
     return false;
   });
@@ -201,8 +206,6 @@ export default function App() {
 
   const isDedicatedExperience =
     location.pathname.startsWith('/admin') ||
-    location.pathname.startsWith('/campaign') ||
-    location.pathname.startsWith('/cinematic') ||
     location.pathname === '/checkout' ||
     location.pathname === '/order-success';
 
@@ -210,17 +213,14 @@ export default function App() {
     <div className="min-h-screen bg-black text-white font-sans selection:bg-[#C0C0C0] selection:text-black antialiased relative">
       <ScrollToTop />
 
-      {/* 0. APPLICATION LOADING STATE (Only on standard storefront pages) */}
-      {appLoading && !isDedicatedExperience && <LoadingScreen />}
+      {/* 0. APPLICATION LOADING STATE (Only when intro is not running) */}
+      {appLoading && !isDedicatedExperience && !introActive && <LoadingScreen />}
 
-      {/* 1. CINEMATIC LUXURY BRAND INTRO */}
+      {/* 1. CINEMATIC LUXURY BRAND INTRO (Permanent loading intro) */}
       {introActive && (
         <CinematicIntro
           onComplete={() => {
             setIntroActive(false);
-            if (typeof window !== 'undefined') {
-              sessionStorage.setItem('cosmic_intro_seen', 'true');
-            }
           }}
         />
       )}
@@ -270,56 +270,22 @@ export default function App() {
             {/* Left Navigation (Desktop) */}
             <nav className="hidden md:flex items-center space-x-10 text-sm font-normal text-[#C0C0C0] tracking-wide">
               <Link
-                to="/#collections"
-                onClick={() => {
-                  if (location.pathname === '/') {
-                    const el = document.getElementById("collections");
-                    if (el) el.scrollIntoView({ behavior: "smooth" });
-                  }
-                }}
-                className="hover:text-white transition-colors relative py-1 group cursor-pointer"
-              >
-                Collections
-                <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-[#C0C0C0] transition-all duration-300 group-hover:w-full" />
-              </Link>
-
-              <Link
-                to="/product/lunar-silver-ring"
+                to="/collections"
                 className={`transition-colors relative py-1 group cursor-pointer ${
-                  location.pathname === '/product/lunar-silver-ring' ? 'text-white font-medium' : 'hover:text-white'
+                  location.pathname === '/collections' ? 'text-white font-medium' : 'hover:text-white'
                 }`}
               >
-                Flagship: Lunar Ring (₹799)
+                Collections
                 <span className={`absolute bottom-0 left-0 h-[1px] bg-[#C0C0C0] transition-all duration-300 ${
-                  location.pathname === '/product/lunar-silver-ring' ? 'w-full' : 'w-0 group-hover:w-full'
+                  location.pathname === '/collections' ? 'w-full' : 'w-0 group-hover:w-full'
                 }`} />
               </Link>
 
               <Link
-                to="/#shop"
-                onClick={() => {
-                  if (location.pathname === '/') {
-                    const el = document.getElementById("shop");
-                    if (el) el.scrollIntoView({ behavior: "smooth" });
-                  }
-                }}
-                className="hover:text-white transition-colors relative py-1 group cursor-pointer"
+                to="/collections"
+                className="hover:text-white transition-colors relative py-1 group cursor-pointer text-[#A0A0A0]"
               >
-                Fine Jewelry
-                <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-[#C0C0C0] transition-all duration-300 group-hover:w-full" />
-              </Link>
-
-              <Link
-                to="/#maison"
-                onClick={() => {
-                  if (location.pathname === '/') {
-                    const el = document.getElementById("maison");
-                    if (el) el.scrollIntoView({ behavior: "smooth" });
-                  }
-                }}
-                className="hover:text-white transition-colors relative py-1 group cursor-pointer"
-              >
-                The Maison
+                Catalog
                 <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-[#C0C0C0] transition-all duration-300 group-hover:w-full" />
               </Link>
             </nav>
@@ -340,16 +306,17 @@ export default function App() {
             {/* Right Navigation / Bag & Account */}
             <div className="flex items-center space-x-6 text-sm tracking-wide">
               <Link
-                to="/#shop"
+                to="/#maison"
                 onClick={() => {
                   if (location.pathname === '/') {
-                    const el = document.getElementById("shop");
+                    const el = document.getElementById("maison");
                     if (el) el.scrollIntoView({ behavior: "smooth" });
                   }
                 }}
-                className="hidden lg:inline text-[#A0A0A0] hover:text-white transition-colors"
+                className="hidden lg:inline text-[#A0A0A0] hover:text-white transition-colors relative py-1 group"
               >
-                Catalog
+                The Maison
+                <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-[#C0C0C0] transition-all duration-300 group-hover:w-full" />
               </Link>
 
               {/* Desktop Auth State Trigger */}
@@ -467,23 +434,7 @@ export default function App() {
                 )}
               </div>
 
-              {/* Experimental Campaign & 3D Switchers */}
-              <Link
-                to="/campaign"
-                className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-[10px] uppercase tracking-[0.15em] text-amber-200 hover:text-white transition-all cursor-pointer"
-                title="View Aakar House-inspired deconstructed campaign hero"
-              >
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-                <span>✦ Campaign Hero</span>
-              </Link>
-              <Link
-                to="/cinematic"
-                className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-[10px] uppercase tracking-[0.15em] text-[#C0C0C0] hover:text-white transition-all cursor-pointer"
-                title="View experimental mobile-first cinematic 3D experience"
-              >
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span>3D Orbit</span>
-              </Link>
+
 
               {/* Private Vault / Wishlist */}
               <Link
@@ -596,16 +547,7 @@ export default function App() {
                         <span>My Orders</span>
                         <span className="text-[#606060] text-xs">→</span>
                       </Link>
-                      <Link
-                        to="/cinematic"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="py-2.5 min-h-[44px] flex items-center justify-between text-white font-medium bg-white/5 px-2 my-1 border border-white/15"
-                      >
-                        <span className="flex items-center gap-2 text-xs uppercase tracking-wider">
-                          <span className="text-emerald-400">✦</span> Cinematic Experience
-                        </span>
-                        <span className="text-white text-xs">→</span>
-                      </Link>
+
                       <Link
                         to="/wishlist"
                         onClick={() => setMobileMenuOpen(false)}
@@ -653,41 +595,23 @@ export default function App() {
               {/* Main Navigation Links */}
               <nav className="flex flex-col space-y-1 text-sm tracking-wide">
                 <span className="text-[10px] uppercase tracking-[0.3em] text-[#606060] mb-2 px-1">
-                  Maison Collections
+                  Maison Navigation
                 </span>
                 <Link
-                  to="/product/lunar-silver-ring"
+                  to="/collections"
                   onClick={() => setMobileMenuOpen(false)}
                   className="text-left text-white font-medium py-2.5 px-1 border-b border-white/5 cursor-pointer flex items-center justify-between min-h-[44px]"
                 >
-                  <span>Lunar Silver Ring (₹799)</span>
-                  <span className="text-[10px] text-[#808080] uppercase tracking-widest">Flagship</span>
+                  <span>Collections</span>
+                  <span className="text-[10px] text-[#808080] uppercase tracking-widest">Full Archive</span>
                 </Link>
                 <Link
-                  to="/#collections"
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    if (location.pathname === '/') {
-                      const el = document.getElementById("collections");
-                      if (el) el.scrollIntoView({ behavior: "smooth" });
-                    }
-                  }}
-                  className="text-[#C0C0C0] hover:text-white py-2.5 px-1 border-b border-white/5 min-h-[44px] flex items-center"
+                  to="/collections"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="text-[#C0C0C0] hover:text-white py-2.5 px-1 border-b border-white/5 min-h-[44px] flex items-center justify-between"
                 >
-                  Collections
-                </Link>
-                <Link
-                  to="/#shop"
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    if (location.pathname === '/') {
-                      const el = document.getElementById("shop");
-                      if (el) el.scrollIntoView({ behavior: "smooth" });
-                    }
-                  }}
-                  className="text-[#C0C0C0] hover:text-white py-2.5 px-1 border-b border-white/5 min-h-[44px] flex items-center"
-                >
-                  Fine Jewelry & Catalog
+                  <span>Catalog</span>
+                  <span className="text-xs text-[#606060]">→</span>
                 </Link>
                 <Link
                   to="/#maison"
@@ -698,39 +622,19 @@ export default function App() {
                       if (el) el.scrollIntoView({ behavior: "smooth" });
                     }
                   }}
-                  className="text-[#C0C0C0] hover:text-white py-2.5 px-1 border-b border-white/5 min-h-[44px] flex items-center"
+                  className="text-[#C0C0C0] hover:text-white py-2.5 px-1 border-b border-white/5 min-h-[44px] flex items-center justify-between"
                 >
-                  The Maison & Craft
+                  <span>The Maison & Philosophy</span>
+                  <span className="text-xs text-[#606060]">→</span>
                 </Link>
-
-                {/* Experimental Prototypes Access on Mobile */}
-                <div className="pt-2 pb-1 flex flex-col gap-1.5">
-                  <span className="text-[9px] uppercase tracking-[0.3em] text-[#606060] px-1">
-                    Experimental Directions
-                  </span>
-                  <Link
-                    to="/campaign"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-between py-2 px-2.5 bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs tracking-wider rounded"
-                  >
-                    <span className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-                      <span>✦ Deconstructed Campaign Hero</span>
-                    </span>
-                    <span className="text-xs">→</span>
-                  </Link>
-                  <Link
-                    to="/cinematic"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-between py-2 px-2.5 bg-white/5 border border-white/10 text-white text-xs tracking-wider rounded"
-                  >
-                    <span className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                      <span>● 3D Orbit Showcase</span>
-                    </span>
-                    <span className="text-xs">→</span>
-                  </Link>
-                </div>
+                <Link
+                  to="/wishlist"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="text-[#C0C0C0] hover:text-white py-2.5 px-1 border-b border-white/5 min-h-[44px] flex items-center justify-between"
+                >
+                  <span>Private Vault</span>
+                  <span className="text-xs text-[#606060]">→</span>
+                </Link>
               </nav>
 
               <div className="pt-2 text-[10px] tracking-wider text-[#606060] uppercase border-t border-white/5">
@@ -748,15 +652,35 @@ export default function App() {
           path="/"
           element={
             <HomePageContent
-              filteredProducts={filteredProducts}
-              activeCategory={activeCategory}
-              setActiveCategory={setActiveCategory}
               onAddToCart={addToCart}
               onQuickView={(p) => setQuickViewProduct(p)}
               newsletterEmail={newsletterEmail}
               setNewsletterEmail={setNewsletterEmail}
               newsletterSubscribed={newsletterSubscribed}
               setNewsletterSubscribed={setNewsletterSubscribed}
+              totalCatalogCount={allProducts.length}
+            />
+          }
+        />
+
+        {/* DEDICATED COLLECTIONS EXPERIENCE */}
+        <Route
+          path="/collections"
+          element={
+            <CollectionsPage
+              products={products}
+              onAddToCart={addToCart}
+              onQuickView={(p) => setQuickViewProduct(p)}
+            />
+          }
+        />
+        <Route
+          path="/catalog"
+          element={
+            <CollectionsPage
+              products={products}
+              onAddToCart={addToCart}
+              onQuickView={(p) => setQuickViewProduct(p)}
             />
           }
         />
@@ -866,21 +790,7 @@ export default function App() {
           element={<LuxuryWishlistVault />}
         />
 
-        {/* EXPERIMENTAL CINEMATIC BRANCH ROUTES */}
-        <Route
-          path="/cinematic"
-          element={<ExperimentalExperience />}
-        />
-        <Route
-          path="/cinematic/product/:slug"
-          element={<CinematicProductPage onAddToCart={addToCart} />}
-        />
 
-        {/* EXPERIMENTAL DECONSTRUCTED CAMPAIGN HERO (AAKAR HOUSE CONCEPT) */}
-        <Route
-          path="/campaign"
-          element={<CampaignExperiencePage />}
-        />
 
         {/* ADMIN LUXURY OPERATIONS CENTER */}
         <Route
@@ -951,76 +861,7 @@ export default function App() {
 
       {/* 4. FOOTER (Hidden on dedicated experiences) */}
       {!isDedicatedExperience && (
-        <footer className="border-t border-white/10 bg-[#030303] py-20 px-6 font-aileron">
-          <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16">
-
-            <div className="lg:col-span-2 space-y-6">
-              <Link to="/" className="inline-block">
-                <span className="font-aileron text-2xl tracking-[0.25em] font-normal chrome-gradient-text">
-                  Cosmic
-                </span>
-              </Link>
-              <p className="text-xs text-[#808080] font-light max-w-sm leading-relaxed">
-                Sculptural fine jewelry and futuristic accessories engineered from solid 925 sterling silver and liquid rhodium. Forged for the modern icon.
-              </p>
-              <div className="text-xs text-[#606060] tracking-wider">
-                Milanese Atelier • Registered Hallmark S925
-              </div>
-            </div>
-
-            <div>
-              <h4 className="text-xs uppercase tracking-[0.25em] text-white font-medium mb-4">
-                Creations
-              </h4>
-              <ul className="space-y-3 text-xs text-[#808080]">
-                <li><Link to="/product/lunar-silver-ring" className="hover:text-white transition-colors">Lunar Silver Ring (₹799)</Link></li>
-                <li><Link to="/product/nova-eclipse-ring" className="hover:text-white transition-colors">Nova Eclipse Ring (₹849)</Link></li>
-                <li><Link to="/product/celestial-pendant" className="hover:text-white transition-colors">Celestial Pendant (₹1299)</Link></li>
-                <li><Link to="/product/orbit-bracelet" className="hover:text-white transition-colors">Orbit Bracelet (₹999)</Link></li>
-                <li><Link to="/product/stellar-chain" className="hover:text-white transition-colors">Stellar Chain (₹1499)</Link></li>
-                <li><Link to="/product/cosmic-signature-pendant" className="hover:text-white transition-colors">Cosmic Signature Pendant</Link></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-xs uppercase tracking-[0.25em] text-white font-medium mb-4">
-                Client Concierge
-              </h4>
-              <ul className="space-y-3 text-xs text-[#808080]">
-                <li><Link to="/account" className="hover:text-white transition-colors">Client Registry</Link></li>
-                <li><Link to="/product/lunar-silver-ring" className="hover:text-white transition-colors">Ring Size Master</Link></li>
-                <li><a href="#shop" className="hover:text-white transition-colors">Insured Shipping</a></li>
-                <li><a href="#shop" className="hover:text-white transition-colors">30-Day Exchanges</a></li>
-                <li><a href="#maison" className="hover:text-white transition-colors">Lifetime Care Service</a></li>
-                <li><a href="mailto:concierge@cosmic-maison.com" className="hover:text-white transition-colors">Bespoke Inquiries</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-xs uppercase tracking-[0.25em] text-white font-medium mb-4">
-                Maison
-              </h4>
-              <ul className="space-y-3 text-xs text-[#808080]">
-                <li><a href="#maison" className="hover:text-white transition-colors">The Atelier</a></li>
-                <li><a href="#maison" className="hover:text-white transition-colors">Sustainable 925</a></li>
-                <li><a href="#shop" className="hover:text-white transition-colors">Press & Editorial</a></li>
-                <li><a href="#shop" className="hover:text-white transition-colors">Global Boutiques</a></li>
-              </ul>
-            </div>
-
-          </div>
-
-          <div className="max-w-7xl mx-auto pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between text-[11px] uppercase tracking-[0.2em] text-[#606060]">
-            <div>
-              © {new Date().getFullYear()} COSMIC HAUTE JOAILLERIE S.P.A. ALL RIGHTS RESERVED.
-            </div>
-            <div className="flex gap-6 mt-4 md:mt-0">
-              <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
-              <a href="#" className="hover:text-white transition-colors">Authenticity Certificate</a>
-            </div>
-          </div>
-        </footer>
+        <Footer />
       )}
 
       {/* QUICK VIEW PRODUCT MODAL */}
@@ -1194,17 +1035,40 @@ export default function App() {
                   )}
                 </div>
 
-                {/* Curved Recommendation Carousel */}
+                {/* Curated Suite Recommendations (Minimalist, Zero Carousel) */}
                 {allProducts.length > 0 && (
                   <div className="pt-4 border-t border-white/10 mt-4">
-                    <CurvedRecommendationCarousel
-                      products={allProducts.filter((p) => !cart.some((c) => c.productId === p.id || c.slug === p.slug))}
-                      title="COMPLETE THE SUITE"
-                      onProductClick={(recProduct) => {
-                        setCartOpen(false);
-                        navigate(`/product/${recProduct.slug}`);
-                      }}
-                    />
+                    <span className="text-[9px] uppercase tracking-[0.25em] text-[#707070] font-mono block mb-3">
+                      Complete The Suite
+                    </span>
+                    <div className="grid grid-cols-2 gap-2.5">
+                      {allProducts
+                        .filter((p) => !cart.some((c) => c.productId === p.id || c.slug === p.slug))
+                        .slice(0, 2)
+                        .map((rec) => (
+                          <button
+                            key={rec.id}
+                            type="button"
+                            onClick={() => {
+                              setCartOpen(false);
+                              navigate(`/product/${rec.slug}`);
+                            }}
+                            className="flex items-center gap-2 p-2 bg-white/5 border border-white/10 hover:border-white/30 text-left transition-all cursor-pointer group rounded-sm"
+                          >
+                            <img
+                              src={rec.images?.[0]?.src || rec.gallery?.[0]?.src || rec.image}
+                              alt={rec.name}
+                              className="w-10 h-10 object-cover bg-neutral-900 border border-white/10 shrink-0"
+                            />
+                            <div className="min-w-0">
+                              <h5 className="text-[10px] uppercase font-serif text-white truncate group-hover:text-[#C0C0C0] transition-colors">
+                                {rec.name}
+                              </h5>
+                              <span className="text-[9px] font-mono text-[#A0A0A0]">₹{rec.price}</span>
+                            </div>
+                          </button>
+                        ))}
+                    </div>
                   </div>
                 )}
               </div>
@@ -1263,190 +1127,36 @@ export default function App() {
 }
 
 function HomePageContent({
-  filteredProducts,
-  activeCategory,
-  setActiveCategory,
   onAddToCart,
   onQuickView,
   newsletterEmail,
   setNewsletterEmail,
   newsletterSubscribed,
   setNewsletterSubscribed,
+  totalCatalogCount = 9,
 }) {
   return (
     <div className="flex flex-col w-full">
-      {/* 1. HERO SECTION (Classic Cosmic Storefront) */}
-      <section className="relative h-[90vh] w-full overflow-hidden flex items-center justify-center text-center px-4">
-        <div className="absolute inset-0 z-0">
-          <img
-            src={heroEditorial}
-            alt="Cosmic Hero"
-            className="w-full h-full object-cover opacity-60 scale-105 animate-slow-zoom"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black" />
-        </div>
+      {/* SECTION 1: ARCHITECTURAL SPLIT-IMAGE CAMPAIGN HERO */}
+      <ArchitecturalCampaignHero />
 
-        <div className="relative z-10 max-w-4xl space-y-6 animate-fade-in-up">
-          <span className="text-[10px] uppercase tracking-[0.5em] text-[#C0C0C0] block mb-2">
-            Maison Cosmic
-          </span>
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif uppercase tracking-tighter text-white font-normal leading-[0.9]">
-            Sculpting the <br />
-            <span className="chrome-gradient-text italic">Celestial</span> Void
-          </h1>
-          <p className="text-sm md:text-base text-[#A0A0A0] font-light max-w-xl mx-auto leading-relaxed tracking-wide">
-            Architectural fine jewelry engineered from solid 925 sterling silver.
-            Forged in our Milanese atelier for the modern icon.
-          </p>
-          <div className="pt-8">
-            <a
-              href="#shop"
-              className="inline-block px-10 py-4 chrome-button text-xs uppercase tracking-[0.3em] font-bold transition-all hover:scale-105"
-            >
-              Enter The Showroom
-            </a>
-          </div>
-        </div>
-      </section>
+      {/* SECTION 2: FEATURED PIECES (4 Signature Products with GSAP ScrollTrigger Storytelling) */}
+      <EditorialFeaturedPieces
+        onAddToCart={onAddToCart}
+        onQuickView={onQuickView}
+      />
 
-      {/* 2. COLLECTIONS FILTER */}
-      <section id="collections" className="py-20 px-4 sm:px-8 lg:px-12 max-w-7xl mx-auto w-full">
-        <div className="text-center mb-12 space-y-3">
-          <h2 className="text-3xl font-serif uppercase tracking-wider text-white">The Collections</h2>
-          <div className="w-12 h-px bg-[#C0C0C0] mx-auto" />
-        </div>
+      {/* SECTION 3: THE MAISON / BRAND STORY */}
+      <BrandStory />
 
-        <div className="flex flex-wrap justify-center gap-3 md:gap-6">
-          {["All", "Rings", "Necklaces", "Bracelets"].map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`px-6 py-2 text-[10px] uppercase tracking-[0.2em] transition-all border ${
-                activeCategory === cat
-                ? "border-white text-white bg-white/10"
-                : "border-white/20 text-[#707070] hover:border-white/50 hover:text-white"
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-      </section>
+      {/* SECTION 4: COLLECTIONS PREVIEW */}
+      <CollectionsPreview />
 
-      {/* 3. PRODUCT SHOP GRID */}
-      <section id="shop" className="py-20 px-4 sm:px-8 lg:px-12 max-w-7xl mx-auto w-full">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
-          {filteredProducts.map((product, index) => {
-            const imgUrl = product.images?.[0]?.src || product.gallery?.[0]?.src || product.image || '/assets/lunar_collection.jpg';
-            const isFlagship = index === 0;
+      {/* SECTION 5: CRAFTSMANSHIP / MATERIALS */}
+      <Craftsmanship />
 
-            return (
-              <Link
-                key={product.id}
-                to={`/product/${product.slug}`}
-                className={`group relative flex flex-col transition-all duration-500 ${
-                  isFlagship ? 'lg:col-span-2 lg:row-span-1' : ''
-                }`}
-              >
-                {/* Image Container */}
-                <div className={`relative overflow-hidden bg-[#050505] chrome-border-refined group-hover:border-white/30 transition-all ${
-                  isFlagship ? 'aspect-[16/9] lg:aspect-[21/9]' : 'aspect-[3/4]'
-                }`}>
-                  <img
-                    src={imgUrl}
-                    alt={product.name}
-                    className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 filter brightness-90"
-                    onError={(e) => {
-                      e.target.src = '/assets/lunar_collection.jpg';
-                    }}
-                  />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-300 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100">
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        onQuickView(product);
-                      }}
-                      className="px-4 py-2 bg-white text-black text-[10px] uppercase tracking-widest font-bold hover:bg-[#C0C0C0] transition-colors"
-                    >
-                      Quick View
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        onAddToCart(product);
-                      }}
-                      className="p-2 bg-white/20 backdrop-blur-md text-white border border-white/30 hover:bg-white hover:text-black transition-all"
-                      title="Add to Bag"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                      </svg>
-                    </button>
-                  </div>
-                  <div className="absolute top-3 left-3 text-[8px] uppercase tracking-widest bg-black/60 px-2 py-0.5 text-[#C0C0C0] border border-white/10">
-                    {product.tag || product.category}
-                  </div>
-                </div>
-
-                {/* Details */}
-                <div className={`pt-6 space-y-1 ${isFlagship ? 'text-left' : 'text-center'}`}>
-                  <h3 className={`font-serif uppercase tracking-wider text-white group-hover:text-[#C0C0C0] transition-colors ${isFlagship ? 'text-xl sm:text-2xl' : 'text-sm'}`}>
-                    {product.name}
-                  </h3>
-                  <p className="font-mono text-xs text-[#A0A0A0] tracking-tighter">
-                    ₹{product.price}
-                  </p>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-        {filteredProducts.length === 0 && (
-          <div className="text-center py-20 text-[#707070] uppercase tracking-widest text-xs">
-            No creations found in this category.
-          </div>
-        )}
-      </section>
-
-      {/* 4. MAISON STORY SECTION */}
-      <section id="maison" className="py-32 bg-[#050505] border-y border-white/5 overflow-hidden">
-        <div className="max-w-5xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-16 lg:gap-24 items-center">
-          <div className="relative">
-            <img
-              src={lunarImg}
-              alt="Atelier Craft"
-              className="w-full aspect-square object-cover grayscale hover:grayscale-0 transition-all duration-1000 border border-white/10"
-            />
-            <div className="absolute -bottom-6 -right-6 w-32 h-32 border border-white/20 -z-10" />
-          </div>
-          <div className="space-y-8">
-            <div className="space-y-3">
-              <span className="text-[10px] uppercase tracking-[0.3em] text-[#707070] block">
-                Our Philosophy
-              </span>
-              <h2 className="text-3xl md:text-5xl font-serif uppercase tracking-tight text-white leading-tight">
-                Engineering <br /> The Eternal
-              </h2>
-            </div>
-            <p className="text-sm text-[#A0A0A0] font-light leading-relaxed tracking-wide">
-              Cosmic is not merely jewelry; it is architectural exploration. We combine
-              the purity of solid 925 sterling silver with liquid rhodium finishes to
-              create pieces that transcend temporal trends.
-            </p>
-            <p className="text-sm text-[#A0A0A0] font-light leading-relaxed tracking-wide">
-              Each piece is individually hand-finished in our Milanese atelier, ensuring
-              that the geometry of the cosmos is captured in every bevel and curve.
-            </p>
-            <div className="pt-4">
-              <a href="/#shop" className="text-xs uppercase tracking-widest text-white border-b border-white/30 pb-1 hover:border-white transition-all">
-                Discover the Craft →
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* SECTION 6: SOCIAL PROOF / EDITORIAL MENTIONS */}
+      <SocialProof />
 
       {/* 5. NEWSLETTER */}
       <section className="py-32 px-4 max-w-3xl mx-auto text-center space-y-12">
@@ -1480,17 +1190,7 @@ function HomePageContent({
         </form>
       </section>
 
-      {/* SIDE-BY-SIDE COMPARISON SWITCHER PILL */}
-      <div className="fixed bottom-6 left-6 z-40">
-        <Link
-          to="/cinematic"
-          className="px-4 py-2.5 rounded-full bg-black/85 hover:bg-[#111] border border-white/25 hover:border-white/60 text-[10px] uppercase tracking-[0.2em] text-[#C0C0C0] hover:text-white backdrop-blur-xl transition-all shadow-[0_10px_35px_rgba(0,0,0,0.85)] flex items-center gap-2.5 group cursor-pointer"
-        >
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span>Compare: Experimental Cinematic Mode</span>
-          <span className="text-white group-hover:translate-x-1 transition-transform">→</span>
-        </Link>
-      </div>
+
     </div>
   );
 }

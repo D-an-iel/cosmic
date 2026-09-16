@@ -15,35 +15,33 @@ export function useImagePreloader(imageUrls = []) {
       return;
     }
 
+    // Safety fallback: ensure gallery is ALWAYS visible within 350ms max
+    const timer = setTimeout(() => {
+      if (!isCancelled) setIsLoaded(true);
+    }, 350);
+
     const promises = imageUrls.map((src) => {
       return new Promise((resolve) => {
         const img = new Image();
+        img.onload = () => resolve(src);
+        img.onerror = () => resolve(src);
         img.src = src;
-
-        if (img.decode) {
-          img
-            .decode()
-            .then(() => resolve(src))
-            .catch(() => {
-              // Fallback if decode fails
-              img.onload = () => resolve(src);
-              img.onerror = () => resolve(src);
-            });
-        } else {
-          img.onload = () => resolve(src);
-          img.onerror = () => resolve(src);
+        if (img.complete) {
+          resolve(src);
         }
       });
     });
 
     Promise.all(promises).then(() => {
       if (!isCancelled) {
+        clearTimeout(timer);
         setIsLoaded(true);
       }
     });
 
     return () => {
       isCancelled = true;
+      clearTimeout(timer);
     };
   }, [imageUrls]);
 

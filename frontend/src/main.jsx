@@ -5,6 +5,7 @@ import '@fontsource/aileron'
 import './index.css'
 import { AuthProvider } from './context/AuthContext.jsx'
 import { WishlistProvider } from './context/WishlistContext.jsx'
+import SmoothScrollProvider from './components/SmoothScrollProvider.jsx'
 import App from './App.jsx'
 
 createRoot(document.getElementById('root')).render(
@@ -12,9 +13,12 @@ createRoot(document.getElementById('root')).render(
     <BrowserRouter>
       <AuthProvider>
         <WishlistProvider>
-          <App />
+          <SmoothScrollProvider>
+            <App />
+          </SmoothScrollProvider>
         </WishlistProvider>
       </AuthProvider>
     </BrowserRouter>
   </StrictMode>,
 );
+

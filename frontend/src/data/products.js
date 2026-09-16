@@ -615,6 +615,80 @@ export const PRODUCTS = [
     ],
     relatedSlugs: ['celestial-pendant', 'lunar-silver-ring', 'stellar-chain', 'solar-crest-ring'],
   },
+
+  // 9. NOVA GEOMETRIC STUDS
+  {
+    id: 'nova-studs',
+    slug: 'nova-studs',
+    name: 'Nova Geometric Studs',
+    category: 'Lobe Architecture Collection',
+    collection: 'Nova Series',
+    type: 'Earrings',
+    price: 699,
+    rating: 4.9,
+    reviewCount: 19,
+    availability: 'In Stock',
+    tag: 'Architectural Lobe',
+    shortDescription: 'Faceted micro-pyramidal stud earrings sculpted from solid 925 silver with liquid rhodium mirror finish.',
+    story: 'Engineered with razor-sharp geometric bevels that catch ambient light like miniature mirrors. Forged in solid 925 sterling silver with custom secure threaded backs designed for all-day comfort and permanent wear.',
+    colors: COLOR_VARIANTS,
+    sizes: ['One Size'],
+    sizeType: 'Standard',
+    gallery: [
+      { id: 1, src: angleRingImg, alt: 'Nova Geometric Studs - Studio Profile', label: 'Geometric Facets' },
+      { id: 2, src: macroRingImg, alt: 'Nova Geometric Studs - Micro Chamfer', label: 'Macro Edge' },
+      { id: 3, src: onModelRingImg, alt: 'Nova Geometric Studs - Lobe View', label: 'On-Model' },
+      { id: 4, src: heroRingImg, alt: 'Nova Geometric Studs - Architectural Pair', label: 'Architecture' },
+      { id: 5, src: packagingRingImg, alt: 'Nova Geometric Studs - Velvet Box', label: 'Packaging' },
+    ],
+    accordions: {
+      details: [
+        { label: 'Form', value: 'Sculpted micro-pyramidal architectural studs' },
+        { label: 'Backing Mechanism', value: 'Threaded screw post for maximum security' },
+        { label: 'Hallmark', value: 'Laser-inscribed S925 on post' },
+      ],
+      materials: [
+        { label: 'Metal', value: 'Solid 925 Sterling Silver • Liquid Rhodium finish' },
+        { label: 'Hypoallergenic', value: '100% Nickel-free, suitable for sensitive lobes' },
+      ],
+      dimensions: [
+        { label: 'Stud Dimensions', value: '7.5 mm x 7.5 mm' },
+        { label: 'Post Length', value: '10.0 mm' },
+        { label: 'Weight', value: '3.8 grams (pair)' },
+      ],
+      shipping: [
+        { label: 'Dispatch', value: 'Same-day insured dispatch' },
+      ],
+      returns: [
+        { label: 'Policy', value: '30-day white-glove return guarantee' },
+      ],
+      care: [
+        { label: 'Care', value: 'Buff with microfibre polishing cloth' },
+      ],
+    },
+    reviews: [
+      {
+        id: 1,
+        name: 'Siddharth R.',
+        location: 'Mumbai, IN',
+        date: 'August 19, 2026',
+        rating: 5,
+        color: 'Chrome',
+        verified: true,
+        title: 'Sharply cut and catches light beautifully',
+        comment: 'Subtle yet distinct. The screw-back ensures they never loosen during sleep or workouts. Pure luxury craftsmanship.',
+      },
+    ],
+    relatedSlugs: ['lunar-silver-ring', 'celestial-pendant', 'orbit-bracelet', 'nova-eclipse-ring'],
+  },
+];
+
+// The 4 Signature Hero Products featured on the editorial homepage
+export const SIGNATURE_HERO_PRODUCTS = [
+  PRODUCTS.find((p) => p.slug === 'lunar-silver-ring') || PRODUCTS[0],
+  PRODUCTS.find((p) => p.slug === 'celestial-pendant') || PRODUCTS[2],
+  PRODUCTS.find((p) => p.slug === 'orbit-bracelet') || PRODUCTS[3],
+  PRODUCTS.find((p) => p.slug === 'nova-studs') || PRODUCTS[1],
 ];
 
 export function getProductBySlug(slug) {

@@ -256,14 +256,6 @@ export default function ProductDetails({ onAddToCart }) {
           <span className="text-[#333333]">/</span>
           <span className="text-white font-medium tracking-wider truncate">{product.name}</span>
         </nav>
-
-        <Link
-          to={`/cinematic/product/${slug}`}
-          className="px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/25 text-[10px] uppercase tracking-[0.2em] text-[#E0E0E0] hover:text-white transition-all cursor-pointer flex items-center gap-2 shadow-sm"
-        >
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          <span>Compare: Cinematic Snap View →</span>
-        </Link>
       </div>
 
       {/* ========================================================================= */}

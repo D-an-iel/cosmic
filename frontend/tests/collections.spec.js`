@@ -1,0 +1,45 @@
+import { test, expect } from '@playwright/test';
+
+test.describe('Collections Page Lookbook Verification', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/collections');
+  });
+
+  test('should render the editorial header', async ({ page }) => {
+    await expect(page.locator('h1')).toContainText('Collections');
+    await expect(page.locator('text=The Archive')).toBeVisible();
+  });
+
+  test('should render all collection chapters', async ({ page }) => {
+    const chapters = ['Rings', 'Necklaces', 'Bracelets', 'Earrings'];
+    for (const chapter of chapters) {
+      const heading = page.locator(`h2:has-text("${chapter}")`);
+      await expect(heading).toBeVisible();
+    }
+  });
+
+  test('should have horizontal scroll containers for each chapter', async ({ page }) => {
+    // Check for the scrollbar-hide class or overflow-x-auto
+    const scrollContainers = page.locator('.overflow-x-auto');
+    const count = await scrollContainers.count();
+    expect(count).toBeGreaterThanOrEqual(4);
+  });
+
+  test('product cards should have minimal info (Name and Price)', async ({ page }) => {
+    const firstProduct = page.locator('.group').first();
+    await expect(firstProduct).toBeVisible();
+
+    // Should contain name and price, but NOT buttons or borders
+    await expect(firstProduct).toContainText('₹');
+    const button = firstProduct.locator('button');
+    await expect(button).toHaveCount(0);
+  });
+
+  test('clicking a product should navigate to product details', async ({ page }) => {
+    const firstProductLink = page.locator('a').filter({ hasText: '₹' }).first();
+    await firstProductLink.click();
+
+    // Verify URL changes to /product/...
+    await expect(page).toHaveURL(/\/product\/.+/);
+  });
+});

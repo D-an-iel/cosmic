@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import SmoothScrollProvider from '../experimental/SmoothScrollProvider.jsx';
 import DeconstructedCampaignHero from './DeconstructedCampaignHero.jsx';
 import FloatingArcExhibition from './FloatingArcExhibition.jsx';
 import { useWishlist } from '../../context/WishlistContext.jsx';
-import { ArrowLeft, Heart, Sparkles, Orbit, Layers } from 'lucide-react';
+import { ArrowLeft, Heart, Orbit } from 'lucide-react';
 
 export default function CampaignExperiencePage() {
   const navigate = useNavigate();
@@ -15,8 +14,7 @@ export default function CampaignExperiencePage() {
   }, []);
 
   return (
-    <SmoothScrollProvider>
-      <div className="min-h-screen bg-black text-white font-sans selection:bg-[#C0C0C0] selection:text-black antialiased relative">
+    <div className="min-h-screen bg-black text-white font-sans selection:bg-[#C0C0C0] selection:text-black antialiased relative">
         
         {/* 1. UNIFIED LUXURY CAMPAIGN TOP BAR */}
         <header className="fixed top-0 left-0 right-0 z-50 bg-[#050505]/90 backdrop-blur-2xl border-b border-white/10 px-6 py-3 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.2em] select-none">
@@ -117,6 +115,5 @@ export default function CampaignExperiencePage() {
         </footer>
 
       </div>
-    </SmoothScrollProvider>
-  );
+    );
 }
