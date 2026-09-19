@@ -9,3 +9,7 @@ app_temp.jsx
 test-payment.js
 devDependencies/
 cosmic/
+package-lock.json
+*.dll
+scratch/
+scratch*
