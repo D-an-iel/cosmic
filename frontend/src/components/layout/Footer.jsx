@@ -22,36 +22,25 @@ export default function Footer() {
 
         <div>
           <h4 className="text-xs uppercase tracking-[0.25em] text-white font-medium mb-4">
-            Maison
+            Navigation
           </h4>
           <ul className="space-y-3 text-xs text-[#808080]">
             <li><Link to="/collections" className="hover:text-white transition-colors">Collections</Link></li>
-            <li><Link to="/collections" className="hover:text-white transition-colors">Catalog</Link></li>
-            <li><a href="#maison" className="hover:text-white transition-colors">The Maison</a></li>
-            <li><Link to="/wishlist" className="hover:text-white transition-colors">Vault</Link></li>
+            <li><Link to="/product/lunar-silver-ring#shipping" className="hover:text-white transition-colors">Shipping</Link></li>
+            <li><Link to="/product/lunar-silver-ring#returns" className="hover:text-white transition-colors">Returns</Link></li>
             <li><a href="mailto:concierge@cosmic-maison.com" className="hover:text-white transition-colors">Contact</a></li>
           </ul>
         </div>
 
         <div>
           <h4 className="text-xs uppercase tracking-[0.25em] text-white font-medium mb-4">
-            Social
+            Social & Legal
           </h4>
           <ul className="space-y-3 text-xs text-[#808080]">
             <li><a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Instagram</a></li>
-            <li><a href="#" className="hover:text-white transition-colors">X (Twitter)</a></li>
-            <li><a href="#" className="hover:text-white transition-colors">Pinterest</a></li>
-          </ul>
-        </div>
-
-        <div>
-          <h4 className="text-xs uppercase tracking-[0.25em] text-white font-medium mb-4">
-            Legal
-          </h4>
-          <ul className="space-y-3 text-xs text-[#808080]">
-            <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
-            <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-            <li><a href="#" className="hover:text-white transition-colors">Authenticity Certificate</a></li>
+            <li><Link to="/privacy" className="hover:text-white transition-colors">Privacy</Link></li>
+            <li><Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
+            <li><Link to="/certificate" className="hover:text-white transition-colors">Hallmark S925</Link></li>
           </ul>
         </div>
       </div>

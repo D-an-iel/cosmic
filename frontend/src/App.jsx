@@ -18,13 +18,14 @@ import ScrollToTop from './components/ScrollToTop.jsx';
 import { PRODUCTS as STATIC_PRODUCTS } from './data/products.js';
 import { useWishlist } from './context/WishlistContext.jsx';
 import LuxuryWishlistVault from './components/luxury-mobile/LuxuryWishlistVault.jsx';
-import ArchitecturalCampaignHero from './components/campaign-hero/ArchitecturalCampaignHero.jsx';
 import CollectionsPage from './pages/CollectionsPage.jsx';
-import EditorialFeaturedPieces from './components/storytelling/EditorialFeaturedPieces.jsx';
-import BrandStory from './components/storytelling/BrandStory.jsx';
-import CollectionsPreview from './components/storytelling/CollectionsPreview.jsx';
-import Craftsmanship from './components/storytelling/Craftsmanship.jsx';
-import SocialProof from './components/storytelling/SocialProof.jsx';
+import HeroBanner from './components/home/HeroBanner.jsx';
+import CategoryStrip from './components/home/CategoryStrip.jsx';
+import LatestDrops from './components/home/LatestDrops.jsx';
+import WearCosmic from './components/home/WearCosmic.jsx';
+import CampaignBanner from './components/home/CampaignBanner.jsx';
+import CustomerReviews from './components/home/CustomerReviews.jsx';
+import InstagramFeed from './components/home/InstagramFeed.jsx';
 import Footer from './components/layout/Footer.jsx';
 
 import AdminGuard from './components/admin/AdminGuard.jsx';
@@ -81,31 +82,30 @@ export default function App() {
     navigate('/');
   };
 
-  // Permanent Brand Intro / Loading Screen - always plays when entering the root homepage
-  const [introActive, setIntroActive] = useState(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        sessionStorage.removeItem('cosmic_intro_seen');
-      } catch (e) {}
-      return window.location.pathname === '/' || window.location.pathname === '';
-    }
-    return false;
-  });
+  // Cinematic Luxury Brand Intro Sequence
+  const [introActive, setIntroActive] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
-  const [products, setProducts] = useState([]);
-  const [appLoading, setAppLoading] = useState(true);
+  const [products, setProducts] = useState(STATIC_PRODUCTS);
+  const [appLoading, setAppLoading] = useState(false);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch('http://localhost:4000/api/products');
-        const data = await response.json();
-        if (data.success) {
-          setProducts(data.data);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 2500);
+        const response = await fetch('http://localhost:4000/api/products', { signal: controller.signal });
+        clearTimeout(timeoutId);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && Array.isArray(data.data) && data.data.length > 0) {
+            setProducts(data.data);
+          }
         }
-      } catch (err) {
-        console.error('Error fetching products:', err);
+      } catch (_err) {
+        // Express backend is not running or unreachable (common in frontend dev mode)
+        // Gracefully falls back to high-res STATIC_PRODUCTS catalog without polluting console
+        console.debug('Backend offline, running with static product catalog.');
       } finally {
         setAppLoading(false);
       }
@@ -210,7 +210,7 @@ export default function App() {
     location.pathname === '/order-success';
 
   return (
-    <div className="min-h-screen bg-black text-white font-sans selection:bg-[#C0C0C0] selection:text-black antialiased relative">
+    <div className="min-h-screen bg-black text-white font-sans selection:bg-[#C0C0C0] selection:text-black antialiased relative overflow-x-hidden max-w-full">
       <ScrollToTop />
 
       {/* 0. APPLICATION LOADING STATE (Only when intro is not running) */}
@@ -267,8 +267,8 @@ export default function App() {
               </svg>
             </button>
 
-            {/* Left Navigation (Desktop) */}
-            <nav className="hidden md:flex items-center space-x-10 text-sm font-normal text-[#C0C0C0] tracking-wide">
+            {/* Left Navigation (Desktop): Collections, Catalog, The Maison */}
+            <nav className="hidden md:flex items-center space-x-8 text-sm font-normal text-[#C0C0C0] tracking-wide">
               <Link
                 to="/collections"
                 className={`transition-colors relative py-1 group cursor-pointer ${
@@ -288,6 +288,20 @@ export default function App() {
                 Catalog
                 <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-[#C0C0C0] transition-all duration-300 group-hover:w-full" />
               </Link>
+
+              <Link
+                to="/#maison"
+                onClick={() => {
+                  if (location.pathname === '/') {
+                    const el = document.getElementById("maison");
+                    if (el) el.scrollIntoView({ behavior: "smooth" });
+                  }
+                }}
+                className="hover:text-white transition-colors relative py-1 group cursor-pointer text-[#A0A0A0]"
+              >
+                The Maison
+                <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-[#C0C0C0] transition-all duration-300 group-hover:w-full" />
+              </Link>
             </nav>
 
             {/* Center Brand Logo */}
@@ -303,20 +317,36 @@ export default function App() {
               </span>
             </Link>
 
-            {/* Right Navigation / Bag & Account */}
-            <div className="flex items-center space-x-6 text-sm tracking-wide">
+            {/* Right Navigation: Vault, Wishlist, Account, Cart */}
+            <div className="flex items-center space-x-5 text-sm tracking-wide">
+              {/* Vault */}
               <Link
-                to="/#maison"
-                onClick={() => {
-                  if (location.pathname === '/') {
-                    const el = document.getElementById("maison");
-                    if (el) el.scrollIntoView({ behavior: "smooth" });
-                  }
-                }}
-                className="hidden lg:inline text-[#A0A0A0] hover:text-white transition-colors relative py-1 group"
+                to="/wishlist"
+                className="hidden lg:inline-flex items-center text-[#A0A0A0] hover:text-white transition-colors relative py-1 group"
               >
-                The Maison
+                Vault
                 <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-[#C0C0C0] transition-all duration-300 group-hover:w-full" />
+              </Link>
+
+              {/* Wishlist */}
+              <Link
+                to="/wishlist"
+                className="relative p-1 text-[#A0A0A0] hover:text-white transition-colors flex items-center gap-1.5 group cursor-pointer"
+                aria-label="Wishlist"
+              >
+                <span className="hidden sm:inline text-sm text-[#A0A0A0] group-hover:text-white">
+                  Wishlist
+                </span>
+                <div className="relative">
+                  <svg className="w-4 h-4 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                  {wishlistCount > 0 && (
+                    <span className="absolute -top-1.5 -right-2 bg-white text-black text-[9px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center">
+                      {wishlistCount}
+                    </span>
+                  )}
+                </div>
               </Link>
 
               {/* Desktop Auth State Trigger */}
@@ -434,37 +464,14 @@ export default function App() {
                 )}
               </div>
 
-
-
-              {/* Private Vault / Wishlist */}
-              <Link
-                to="/wishlist"
-                className="relative p-2 text-white hover:text-[#C0C0C0] transition-colors flex items-center gap-1.5 group cursor-pointer"
-                aria-label="Private Vault"
-              >
-                <span className="text-sm tracking-wide hidden sm:inline text-[#A0A0A0] group-hover:text-white">
-                  Vault
-                </span>
-                <div className="relative">
-                  <svg className="w-5 h-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                  </svg>
-                  {wishlistCount > 0 && (
-                    <span className="absolute -top-1.5 -right-2 bg-white text-black text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
-                      {wishlistCount}
-                    </span>
-                  )}
-                </div>
-              </Link>
-
-              {/* Shopping Bag */}
+              {/* Shopping Cart */}
               <button
                 onClick={() => setCartOpen(true)}
                 className="relative p-2 text-white hover:text-[#C0C0C0] transition-colors flex items-center gap-2 group cursor-pointer"
-                aria-label="Shopping Bag"
+                aria-label="Shopping Cart"
               >
                 <span className="text-sm tracking-wide hidden sm:inline text-[#A0A0A0] group-hover:text-white">
-                  Bag
+                  Cart
                 </span>
                 <div className="relative">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -624,7 +631,7 @@ export default function App() {
                   }}
                   className="text-[#C0C0C0] hover:text-white py-2.5 px-1 border-b border-white/5 min-h-[44px] flex items-center justify-between"
                 >
-                  <span>The Maison & Philosophy</span>
+                  <span>The Maison</span>
                   <span className="text-xs text-[#606060]">→</span>
                 </Link>
                 <Link
@@ -632,9 +639,52 @@ export default function App() {
                   onClick={() => setMobileMenuOpen(false)}
                   className="text-[#C0C0C0] hover:text-white py-2.5 px-1 border-b border-white/5 min-h-[44px] flex items-center justify-between"
                 >
-                  <span>Private Vault</span>
+                  <span>Vault</span>
                   <span className="text-xs text-[#606060]">→</span>
                 </Link>
+                <Link
+                  to="/wishlist"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="text-[#C0C0C0] hover:text-white py-2.5 px-1 border-b border-white/5 min-h-[44px] flex items-center justify-between"
+                >
+                  <span className="flex items-center gap-2">
+                    <span>Wishlist</span>
+                    {wishlistCount > 0 && (
+                      <span className="px-1.5 py-0.2 bg-white text-black font-bold text-[9px] rounded-full">
+                        {wishlistCount}
+                      </span>
+                    )}
+                  </span>
+                  <span className="text-xs text-[#606060]">→</span>
+                </Link>
+                <Link
+                  to={user ? "/account" : "#"}
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    if (!user) setIsGlobalLoginModalOpen(true);
+                  }}
+                  className="text-[#C0C0C0] hover:text-white py-2.5 px-1 border-b border-white/5 min-h-[44px] flex items-center justify-between"
+                >
+                  <span>Account</span>
+                  <span className="text-xs text-[#606060]">{user ? 'Profile →' : 'Login →'}</span>
+                </Link>
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setCartOpen(true);
+                  }}
+                  className="text-[#C0C0C0] hover:text-white py-2.5 px-1 border-b border-white/5 min-h-[44px] flex items-center justify-between w-full text-left cursor-pointer"
+                >
+                  <span className="flex items-center gap-2">
+                    <span>Cart</span>
+                    {cartCount > 0 && (
+                      <span className="px-1.5 py-0.2 bg-white text-black font-bold text-[9px] rounded-full">
+                        {cartCount}
+                      </span>
+                    )}
+                  </span>
+                  <span className="text-xs text-[#606060]">View Bag →</span>
+                </button>
               </nav>
 
               <div className="pt-2 text-[10px] tracking-wider text-[#606060] uppercase border-t border-white/5">
@@ -1126,71 +1176,31 @@ export default function App() {
   );
 }
 
-function HomePageContent({
-  onAddToCart,
-  onQuickView,
-  newsletterEmail,
-  setNewsletterEmail,
-  newsletterSubscribed,
-  setNewsletterSubscribed,
-  totalCatalogCount = 9,
-}) {
+function HomePageContent() {
   return (
     <div className="flex flex-col w-full">
-      {/* SECTION 1: ARCHITECTURAL SPLIT-IMAGE CAMPAIGN HERO */}
-      <ArchitecturalCampaignHero />
+      {/* SECTION 1: HERO BANNER */}
+      <HeroBanner />
 
-      {/* SECTION 2: FEATURED PIECES (4 Signature Products with GSAP ScrollTrigger Storytelling) */}
-      <EditorialFeaturedPieces
-        onAddToCart={onAddToCart}
-        onQuickView={onQuickView}
-      />
+      {/* SECTION 2: CATEGORIES */}
+      <CategoryStrip />
 
-      {/* SECTION 3: THE MAISON / BRAND STORY */}
-      <BrandStory />
+      {/* SECTION 3: LATEST DROPS */}
+      <LatestDrops />
 
-      {/* SECTION 4: COLLECTIONS PREVIEW */}
-      <CollectionsPreview />
+      {/* SECTION 4: WEAR COSMIC */}
+      <WearCosmic />
 
-      {/* SECTION 5: CRAFTSMANSHIP / MATERIALS */}
-      <Craftsmanship />
+      {/* SECTION 5: CAMPAIGN BANNER */}
+      <div id="maison">
+        <CampaignBanner />
+      </div>
 
-      {/* SECTION 6: SOCIAL PROOF / EDITORIAL MENTIONS */}
-      <SocialProof />
+      {/* SECTION 6: CUSTOMER REVIEWS */}
+      <CustomerReviews />
 
-      {/* 5. NEWSLETTER */}
-      <section className="py-32 px-4 max-w-3xl mx-auto text-center space-y-12">
-        <div className="space-y-4">
-          <h2 className="text-3xl font-serif uppercase tracking-wider text-white">Join The Circle</h2>
-          <p className="text-xs text-[#707070] uppercase tracking-widest leading-relaxed">
-            Receive early access to limited drops and atelier notes.
-          </p>
-        </div>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            setNewsletterSubscribed(true);
-          }}
-          className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto"
-        >
-          <input
-            type="email"
-            placeholder="Email Address"
-            value={newsletterEmail}
-            onChange={(e) => setNewsletterEmail(e.target.value)}
-            className="flex-1 bg-transparent border border-white/20 px-4 py-3 text-xs uppercase tracking-widest text-white focus:border-white outline-none transition-all"
-            required
-          />
-          <button
-            type="submit"
-            className="px-8 py-3 chrome-button text-xs uppercase tracking-widest font-bold"
-          >
-            {newsletterSubscribed ? "Subscribed" : "Subscribe"}
-          </button>
-        </form>
-      </section>
-
-
+      {/* SECTION 7: INSTAGRAM FEED */}
+      <InstagramFeed />
     </div>
   );
 }

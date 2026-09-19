@@ -8,6 +8,31 @@ import novaImg from '../assets/nova_collection.jpg';
 import eclipseImg from '../assets/eclipse_collection.jpg';
 import heroEditorial from '../assets/hero_editorial.jpg';
 
+// Premium Studio Pure White #FFFFFF & Lifestyle Assets
+import ringHeroFront from '../assets/products/ring_hero_front.jpg';
+import ringAngle45 from '../assets/products/ring_angle_45.jpg';
+import ringDetailMacro from '../assets/products/ring_detail_macro.jpg';
+import ringLifestyleHand from '../assets/products/ring_lifestyle_hand.jpg';
+import ringWornScale from '../assets/products/ring_worn_scale.jpg';
+
+import pendantHeroFront from '../assets/products/pendant_hero_front.jpg';
+import pendantAngle45 from '../assets/products/pendant_angle_45.jpg';
+import pendantDetailMacro from '../assets/products/pendant_detail_macro.jpg';
+import pendantLifestyleNeck from '../assets/products/pendant_lifestyle_neck.jpg';
+import pendantWornScale from '../assets/products/pendant_worn_scale.jpg';
+
+import braceletHeroFront from '../assets/products/bracelet_hero_front.jpg';
+import braceletAngle45 from '../assets/products/bracelet_angle_45.jpg';
+import braceletDetailMacro from '../assets/products/bracelet_detail_macro.jpg';
+import braceletLifestyleWrist from '../assets/products/bracelet_lifestyle_wrist.jpg';
+import braceletWornScale from '../assets/products/bracelet_worn_scale.jpg';
+
+import earringsHeroFront from '../assets/products/earrings_hero_front.jpg';
+import earringsAngle45 from '../assets/products/earrings_angle_45.jpg';
+import earringsDetailMacro from '../assets/products/earrings_detail_macro.jpg';
+import earringsLifestyleEar from '../assets/products/earrings_lifestyle_ear.jpg';
+import earringsWornScale from '../assets/products/earrings_worn_scale.jpg';
+
 export const COLOR_VARIANTS = [
   { id: 'silver', name: 'Silver', hex: '#E2E8F0', desc: 'Solid 925 Sterling Silver with raw mirror polish' },
   { id: 'chrome', name: 'Chrome', hex: '#94A3B8', desc: 'Liquid Rhodium immersion for extreme mirror sheen' },
@@ -36,11 +61,11 @@ export const PRODUCTS = [
     sizes: ['6', '7', '8', '9', '10'],
     sizeType: 'Size (US)',
     gallery: [
-      { id: 1, src: heroRingImg, alt: 'Lunar Silver Ring - Hero Studio Silhouette', label: 'The Form' },
-      { id: 2, src: macroRingImg, alt: 'Lunar Silver Ring - Celestial Bevel & S925 Hallmark', label: 'Macro Bevel' },
-      { id: 3, src: onModelRingImg, alt: 'Lunar Silver Ring - On Model Editorial Styling', label: 'Silhouette' },
-      { id: 4, src: angleRingImg, alt: 'Lunar Silver Ring - Architectural 45-Degree View', label: 'Architecture' },
-      { id: 5, src: packagingRingImg, alt: 'Lunar Silver Ring - Velvet Monolith Box', label: 'The Monolith' },
+      { id: 1, src: ringHeroFront, alt: 'Lunar Silver Ring - Front Hero Pure White Studio', label: 'Front Hero' },
+      { id: 2, src: ringAngle45, alt: 'Lunar Silver Ring - 45 Degree Angle Perspective', label: '45° Angle' },
+      { id: 3, src: ringDetailMacro, alt: 'Lunar Silver Ring - Macro Bevel & S925 Hallmark', label: 'Macro Detail' },
+      { id: 4, src: ringLifestyleHand, alt: 'Lunar Silver Ring - Editorial Lifestyle Hand Shot', label: 'Editorial' },
+      { id: 5, src: ringWornScale, alt: 'Lunar Silver Ring - Worn Scale Finger Proportion', label: 'Worn Scale' },
     ],
     accordions: {
       details: [
@@ -222,11 +247,11 @@ export const PRODUCTS = [
     sizes: ['18"', '20"', '22"', '24"'],
     sizeType: 'Chain Length',
     gallery: [
-      { id: 1, src: eclipseImg, alt: 'Celestial Pendant - Studio Front', label: 'The Medallion' },
-      { id: 2, src: macroRingImg, alt: 'Celestial Pendant - Macro Chamfer', label: 'Macro Bevel' },
-      { id: 3, src: heroEditorial, alt: 'Celestial Pendant - Editorial Styling', label: 'On-Model' },
-      { id: 4, src: angleRingImg, alt: 'Celestial Pendant - Clasp Detail', label: 'Curb Geometry' },
-      { id: 5, src: packagingRingImg, alt: 'Celestial Pendant - Presentation Case', label: 'Packaging' },
+      { id: 1, src: pendantHeroFront, alt: 'Celestial Pendant - Front Hero Pure White Studio', label: 'Front Hero' },
+      { id: 2, src: pendantAngle45, alt: 'Celestial Pendant - 45 Degree Angle Perspective', label: '45° Angle' },
+      { id: 3, src: pendantDetailMacro, alt: 'Celestial Pendant - Macro Relief & Curb Geometry', label: 'Macro Detail' },
+      { id: 4, src: pendantLifestyleNeck, alt: 'Celestial Pendant - Editorial Lifestyle Neck Shot', label: 'Editorial' },
+      { id: 5, src: pendantWornScale, alt: 'Celestial Pendant - Worn Scale Drape Proportion', label: 'Worn Scale' },
     ],
     accordions: {
       details: [
@@ -305,11 +330,11 @@ export const PRODUCTS = [
     sizes: ['6.5"', '7.0"', '7.5"', '8.0"'],
     sizeType: 'Wrist Size',
     gallery: [
-      { id: 1, src: novaImg, alt: 'Orbit Bracelet - Studio View', label: 'Elliptical Form' },
-      { id: 2, src: macroRingImg, alt: 'Orbit Bracelet - Beveled Edge Detail', label: 'Macro Finish' },
-      { id: 3, src: onModelRingImg, alt: 'Orbit Bracelet - Worn on Wrist', label: 'On-Model' },
-      { id: 4, src: angleRingImg, alt: 'Orbit Bracelet - Architectural Profile', label: 'Architecture' },
-      { id: 5, src: packagingRingImg, alt: 'Orbit Bracelet - Presentation Box', label: 'Packaging' },
+      { id: 1, src: braceletHeroFront, alt: 'Orbit Bracelet - Front Hero Pure White Studio', label: 'Front Hero' },
+      { id: 2, src: braceletAngle45, alt: 'Orbit Bracelet - 45 Degree Angle Perspective', label: '45° Angle' },
+      { id: 3, src: braceletDetailMacro, alt: 'Orbit Bracelet - Macro Terminal & S925 Hallmark', label: 'Macro Detail' },
+      { id: 4, src: braceletLifestyleWrist, alt: 'Orbit Bracelet - Editorial Lifestyle Wrist Shot', label: 'Editorial' },
+      { id: 5, src: braceletWornScale, alt: 'Orbit Bracelet - Worn Scale Arm Proportion', label: 'Worn Scale' },
     ],
     accordions: {
       details: [
@@ -635,11 +660,11 @@ export const PRODUCTS = [
     sizes: ['One Size'],
     sizeType: 'Standard',
     gallery: [
-      { id: 1, src: angleRingImg, alt: 'Nova Geometric Studs - Studio Profile', label: 'Geometric Facets' },
-      { id: 2, src: macroRingImg, alt: 'Nova Geometric Studs - Micro Chamfer', label: 'Macro Edge' },
-      { id: 3, src: onModelRingImg, alt: 'Nova Geometric Studs - Lobe View', label: 'On-Model' },
-      { id: 4, src: heroRingImg, alt: 'Nova Geometric Studs - Architectural Pair', label: 'Architecture' },
-      { id: 5, src: packagingRingImg, alt: 'Nova Geometric Studs - Velvet Box', label: 'Packaging' },
+      { id: 1, src: earringsHeroFront, alt: 'Nova Geometric Studs - Front Hero Pure White Studio', label: 'Front Hero' },
+      { id: 2, src: earringsAngle45, alt: 'Nova Geometric Studs - 45 Degree Angle Perspective', label: '45° Angle' },
+      { id: 3, src: earringsDetailMacro, alt: 'Nova Geometric Studs - Macro Facet & Threaded Post', label: 'Macro Detail' },
+      { id: 4, src: earringsLifestyleEar, alt: 'Nova Geometric Studs - Editorial Lifestyle Ear Shot', label: 'Editorial' },
+      { id: 5, src: earringsWornScale, alt: 'Nova Geometric Studs - Worn Scale Lobe Proportion', label: 'Worn Scale' },
     ],
     accordions: {
       details: [

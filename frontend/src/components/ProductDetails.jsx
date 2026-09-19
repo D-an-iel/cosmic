@@ -10,47 +10,53 @@ export default function ProductDetails({ onAddToCart }) {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const [product, setProduct] = useState(null);
-  const [relatedProducts, setRelatedProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [product, setProduct] = useState(() => getProductBySlug(slug) || null);
+  const [relatedProducts, setRelatedProducts] = useState(() => getRelatedProducts(slug) || []);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchProductData = async () => {
       try {
-        const response = await fetch(`http://localhost:4000/api/products/${slug}`);
-        const data = await response.json();
-        if (data.success) {
-          setProduct(data.data);
-          // In a real app, we'd have a separate endpoint for related products.
-          // For now, we can fetch all and filter, or if the API provides them, use those.
-          const allResp = await fetch('http://localhost:4000/api/products');
-          const allData = await allResp.json();
-          if (allData.success) {
-            const all = allData.data;
-            const currentProduct = all.find(p => p.slug === slug);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 2500);
+        const response = await fetch(`http://localhost:4000/api/products/${slug}`, { signal: controller.signal });
+        clearTimeout(timeoutId);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.data) {
+            setProduct(data.data);
+            const allResp = await fetch('http://localhost:4000/api/products');
+            if (allResp.ok) {
+              const allData = await allResp.json();
+              if (allData.success && Array.isArray(allData.data)) {
+                const all = allData.data;
+                const currentProduct = all.find(p => p.slug === slug);
 
-            // Curation logic:
-            // 1. Same category (Exact match)
-            // 2. Category keyword match (e.g., "Ring" in "Architectural Ring Collection")
-            // 3. Rest of catalog
-            const sameCategory = all.filter(p => p.slug !== slug && p.category === currentProduct?.category);
-            const keywordMatch = all.filter(p => {
-              if (p.slug === slug || sameCategory.includes(p)) return false;
-              const cat = p.category?.toLowerCase() || "";
-              const currentCat = currentProduct?.category?.toLowerCase() || "";
-              // Extract primary keyword (e.g., "Ring" from "Architectural Ring Collection")
-              const keywords = ["ring", "necklace", "bracelet", "earring", "pendant"];
-              const matchedKeyword = keywords.find(k => currentCat.includes(k));
-              return matchedKeyword && cat.includes(matchedKeyword);
-            });
-            const others = all.filter(p => p.slug !== slug && !sameCategory.includes(p) && !keywordMatch.includes(p));
+                const sameCategory = all.filter(p => p.slug !== slug && p.category === currentProduct?.category);
+                const keywordMatch = all.filter(p => {
+                  if (p.slug === slug || sameCategory.includes(p)) return false;
+                  const cat = p.category?.toLowerCase() || "";
+                  const currentCat = currentProduct?.category?.toLowerCase() || "";
+                  const keywords = ["ring", "necklace", "bracelet", "earring", "pendant"];
+                  const matchedKeyword = keywords.find(k => currentCat.includes(k));
+                  return matchedKeyword && cat.includes(matchedKeyword);
+                });
+                const others = all.filter(p => p.slug !== slug && !sameCategory.includes(p) && !keywordMatch.includes(p));
 
-            const related = [...sameCategory, ...keywordMatch, ...others].slice(0, 4);
-            setRelatedProducts(related);
+                const related = [...sameCategory, ...keywordMatch, ...others].slice(0, 4);
+                setRelatedProducts(related);
+              }
+            }
           }
         }
       } catch (err) {
-        console.error('Error fetching product:', err);
+        // Express backend is offline; fallback seamlessly to static catalog
+        const fallback = getProductBySlug(slug);
+        if (fallback) {
+          setProduct(fallback);
+          setRelatedProducts(getRelatedProducts(slug));
+        }
+        console.debug('Backend offline, using static product details.');
       } finally {
         setLoading(false);
       }
